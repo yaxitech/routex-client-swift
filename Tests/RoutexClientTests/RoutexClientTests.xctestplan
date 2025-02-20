@@ -1,0 +1,38 @@
+{
+  "configurations" : [
+    {
+      "id" : "4A08121F-B7B8-43D1-BE1D-1CB6A511AD17",
+      "name" : "Test Scheme Action",
+      "options" : {
+        "environmentVariableEntries" : [
+          {
+            "key" : "KEY_ID",
+            "value" : "$(KEY_ID)"
+          },
+          {
+            "key" : "KEY",
+            "value" : "$(KEY)"
+          }
+        ],
+        "targetForVariableExpansion" : {
+          "containerPath" : "container:",
+          "identifier" : "RoutexClientTests",
+          "name" : "RoutexClientTests"
+        }
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "RoutexClientTests",
+        "name" : "RoutexClientTests"
+      }
+    }
+  ],
+  "version" : 1
+}

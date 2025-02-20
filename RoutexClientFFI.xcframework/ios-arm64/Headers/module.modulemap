@@ -1,0 +1,10 @@
+module kitx_coreFFI {
+    header "kitx_coreFFI.h"
+    export *
+}module routex_apiFFI {
+    header "routex_apiFFI.h"
+    export *
+}module routex_clientFFI {
+    header "routex_clientFFI.h"
+    export *
+}
