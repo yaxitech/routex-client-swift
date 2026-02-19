@@ -12,6 +12,10 @@
           {
             "key" : "KEY",
             "value" : "$(KEY)"
+          },
+          {
+            "key" : "ROUTEX_URL",
+            "value" : "$(ROUTEX_URL)"
           }
         ],
         "targetForVariableExpansion" : {

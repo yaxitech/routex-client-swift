@@ -21,5 +21,5 @@ jobs:
           xcodebuild test \
             -scheme routex-client-swift \
             -testPlan RoutexClientTests \
-            -destination 'platform=iOS Simulator,OS=18.2,name=iPhone 16' \
-            KEY_ID=test KEY="${{ secrets.KEY }}"
+            -destination 'platform=iOS Simulator,OS=18.5,name=iPhone 16' \
+            KEY_ID=test KEY="${{ secrets.KEY }}" ROUTEX_URL="${{ secrets.ROUTEX_URL }}"

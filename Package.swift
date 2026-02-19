@@ -16,7 +16,7 @@ let package = Package(
 
   dependencies: [
     // N.B. only used in tests to issue JWTs, not a recommendation
-    .package(url: "https://github.com/vapor/jwt-kit", .upToNextMajor(from: "5.0.0"))
+    .package(url: "https://github.com/vapor/jwt-kit", "5.0.0"..<"5.3.0")
   ],
 
   targets: [
