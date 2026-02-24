@@ -609,6 +609,8 @@ public struct Account: Equatable, Hashable {
     }
 
     
+
+    
 }
 
 #if compiler(>=6)
@@ -685,6 +687,8 @@ public struct AccountBalances: Equatable, Hashable {
     }
 
     
+
+    
 }
 
 #if compiler(>=6)
@@ -735,6 +739,8 @@ public struct AccountReference: Equatable, Hashable {
         self.id = id
         self.currency = currency
     }
+
+    
 
     
 }
@@ -789,6 +795,8 @@ public struct Balance: Equatable, Hashable {
         self.currency = currency
         self.balanceType = balanceType
     }
+
+    
 
     
 }
@@ -855,6 +863,8 @@ public struct Balances: Equatable, Hashable {
         self.balances = balances
         self.missingAccounts = missingAccounts
     }
+
+    
 
     
 }
@@ -925,6 +935,8 @@ public struct BatchData: Equatable, Hashable {
         self.numberOfTransactions = numberOfTransactions
         self.transactions = transactions
     }
+
+    
 
     
 }
@@ -1115,6 +1127,8 @@ public struct BatchTransactionDetails: Equatable, Hashable {
     }
 
     
+
+    
 }
 
 #if compiler(>=6)
@@ -1260,6 +1274,8 @@ public struct ConnectionInfo: Equatable, Hashable {
     }
 
     
+
+    
 }
 
 #if compiler(>=6)
@@ -1326,6 +1342,8 @@ public struct Credentials: Equatable, Hashable {
         self.password = password
         self.connectionData = connectionData
     }
+
+    
 
     
 }
@@ -1406,6 +1424,8 @@ public struct ExchangeRate: Equatable, Hashable {
         self.unitCurrency = unitCurrency
         self.exchangeRate = exchangeRate
     }
+
+    
 
     
 }
@@ -1492,6 +1512,8 @@ public struct Party: Equatable, Hashable {
     }
 
     
+
+    
 }
 
 #if compiler(>=6)
@@ -1548,6 +1570,8 @@ public struct PaymentInitiation: Equatable, Hashable {
         self.debtorName = debtorName
         self.debtorIban = debtorIban
     }
+
+    
 
     
 }
@@ -1782,6 +1806,8 @@ public struct Transaction: Equatable, Hashable {
     }
 
     
+
+    
 }
 
 #if compiler(>=6)
@@ -1874,6 +1900,8 @@ public struct Transfer: Equatable, Hashable {
     }
 
     
+
+    
 }
 
 #if compiler(>=6)
@@ -1934,6 +1962,8 @@ public struct TransferDetails: Equatable, Hashable {
         self.remittance = remittance
         self.chargeBearer = chargeBearer
     }
+
+    
 
     
 }
@@ -2003,6 +2033,8 @@ public enum AccountField: Equatable, Hashable {
     case productName
     case status
     case type
+
+
 
 
 
@@ -2128,6 +2160,8 @@ public enum AccountIdentifier: Equatable, Hashable {
 
 
 
+
+
 }
 
 #if compiler(>=6)
@@ -2196,6 +2230,8 @@ public enum BalanceType: Equatable, Hashable {
      * Expected balance from booked and pending transactions.
      */
     case expected
+
+
 
 
 
@@ -2299,6 +2335,8 @@ public enum BankTransactionCode: Equatable, Hashable {
      */
     case other(code: String, issuer: String?
     )
+
+
 
 
 
@@ -2408,6 +2446,8 @@ public enum ConnectionType: Equatable, Hashable {
 
 
 
+
+
 }
 
 #if compiler(>=6)
@@ -2470,6 +2510,8 @@ public enum Field: Equatable, Hashable {
     
     case debtorIban
     case debtorName
+
+
 
 
 
@@ -2554,6 +2596,8 @@ public enum PaymentStatus: Equatable, Hashable {
 
 
 
+
+
 }
 
 #if compiler(>=6)
@@ -2627,6 +2671,8 @@ public func FfiConverterTypePaymentStatus_lower(_ value: PaymentStatus) -> RustB
 public enum SupportedService: Equatable, Hashable {
     
     case collectPayment
+
+
 
 
 
@@ -2720,6 +2766,8 @@ public enum TicketErrorCode: Equatable, Hashable {
      * Environment mismatch between key and routex
      */
     case keyEnvironmentMismatch
+
+
 
 
 

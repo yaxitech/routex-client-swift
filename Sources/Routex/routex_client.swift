@@ -602,6 +602,11 @@ open class AuthenticatedAccountsResult: AuthenticatedAccountsResultProtocol, @un
     // No primary constructor declared for this class.
 
     deinit {
+        if handle == 0 {
+            // Mock objects have handle=0 don't try to free them
+            return
+        }
+
         try! rustCall { uniffi_routex_client_uniffi_fn_free_authenticatedaccountsresult(handle, $0) }
     }
 
@@ -723,6 +728,11 @@ open class AuthenticatedBalancesResult: AuthenticatedBalancesResultProtocol, @un
     // No primary constructor declared for this class.
 
     deinit {
+        if handle == 0 {
+            // Mock objects have handle=0 don't try to free them
+            return
+        }
+
         try! rustCall { uniffi_routex_client_uniffi_fn_free_authenticatedbalancesresult(handle, $0) }
     }
 
@@ -844,6 +854,11 @@ open class AuthenticatedCollectPaymentResult: AuthenticatedCollectPaymentResultP
     // No primary constructor declared for this class.
 
     deinit {
+        if handle == 0 {
+            // Mock objects have handle=0 don't try to free them
+            return
+        }
+
         try! rustCall { uniffi_routex_client_uniffi_fn_free_authenticatedcollectpaymentresult(handle, $0) }
     }
 
@@ -965,6 +980,11 @@ open class AuthenticatedTransactionsResult: AuthenticatedTransactionsResultProto
     // No primary constructor declared for this class.
 
     deinit {
+        if handle == 0 {
+            // Mock objects have handle=0 don't try to free them
+            return
+        }
+
         try! rustCall { uniffi_routex_client_uniffi_fn_free_authenticatedtransactionsresult(handle, $0) }
     }
 
@@ -1086,6 +1106,11 @@ open class AuthenticatedTransferResult: AuthenticatedTransferResultProtocol, @un
     // No primary constructor declared for this class.
 
     deinit {
+        if handle == 0 {
+            // Mock objects have handle=0 don't try to free them
+            return
+        }
+
         try! rustCall { uniffi_routex_client_uniffi_fn_free_authenticatedtransferresult(handle, $0) }
     }
 
@@ -1196,7 +1221,7 @@ public protocol RoutexClientProtocol: AnyObject, Sendable {
     
     func settleKey(ticket: Ticket) async throws 
     
-    func systemVersion(ticketId: String) async  -> String?
+    func systemVersion(ticketId: String) async throws  -> String?
     
     func trace(ticket: Ticket, traceId: Data) async throws  -> String
     
@@ -1259,6 +1284,11 @@ public convenience init(distribution: String, version: String, url: Url) {
 }
 
     deinit {
+        if handle == 0 {
+            // Mock objects have handle=0 don't try to free them
+            return
+        }
+
         try! rustCall { uniffi_routex_client_uniffi_fn_free_routexclient(handle, $0) }
     }
 
@@ -1562,9 +1592,9 @@ open func settleKey(ticket: Ticket)async throws   {
         )
 }
     
-open func systemVersion(ticketId: String)async  -> String?  {
+open func systemVersion(ticketId: String)async throws  -> String?  {
     return
-        try!  await uniffiRustCallAsync(
+        try  await uniffiRustCallAsync(
             rustFutureFunc: {
                 uniffi_routex_client_uniffi_fn_method_routexclient_system_version(
                     self.uniffiCloneHandle(),
@@ -1575,8 +1605,7 @@ open func systemVersion(ticketId: String)async  -> String?  {
             completeFunc: ffi_routex_client_uniffi_rust_future_complete_rust_buffer,
             freeFunc: ffi_routex_client_uniffi_rust_future_free_rust_buffer,
             liftFunc: FfiConverterOptionString.lift,
-            errorHandler: nil
-            
+            errorHandler: FfiConverterTypeRoutexClientError_lift
         )
 }
     
@@ -1701,6 +1730,8 @@ public struct AccountsResult: Equatable, Hashable {
     }
 
     
+
+    
 }
 
 #if compiler(>=6)
@@ -1755,6 +1786,8 @@ public struct BalancesResult: Equatable, Hashable {
         self.ticketId = ticketId
         self.timestamp = timestamp
     }
+
+    
 
     
 }
@@ -1813,6 +1846,8 @@ public struct CollectPaymentResult: Equatable, Hashable {
     }
 
     
+
+    
 }
 
 #if compiler(>=6)
@@ -1869,6 +1904,8 @@ public struct TransactionsResult: Equatable, Hashable {
     }
 
     
+
+    
 }
 
 #if compiler(>=6)
@@ -1923,6 +1960,8 @@ public struct TransferResult: Equatable, Hashable {
         self.ticketId = ticketId
         self.timestamp = timestamp
     }
+
+    
 
     
 }
@@ -2021,6 +2060,8 @@ public enum AccountFilter: Equatable, Hashable {
     )
     case supports(service: SupportedService
     )
+
+
 
 
 
@@ -2289,6 +2330,8 @@ public enum AccountsResponse {
 
 
 
+
+
 }
 
 #if compiler(>=6)
@@ -2393,6 +2436,8 @@ public enum BalancesResponse {
 
 
 
+
+
 }
 
 #if compiler(>=6)
@@ -2494,6 +2539,8 @@ public enum CollectPaymentResponse {
     )
     case redirectHandle(handle: String, context: ConfirmationContext
     )
+
+
 
 
 
@@ -2634,6 +2681,8 @@ public enum DialogInput: Equatable, Hashable {
 
 
 
+
+
 }
 
 #if compiler(>=6)
@@ -2750,6 +2799,8 @@ public enum SearchFilter: Equatable, Hashable {
 
 
 
+
+
 }
 
 #if compiler(>=6)
@@ -2863,6 +2914,8 @@ public enum TransactionsResponse {
 
 
 
+
+
 }
 
 #if compiler(>=6)
@@ -2964,6 +3017,8 @@ public enum TransferResponse {
     )
     case redirectHandle(handle: String, context: ConfirmationContext
     )
+
+
 
 
 
@@ -3841,7 +3896,7 @@ private let initializationResult: InitializationResult = {
     if (uniffi_routex_client_uniffi_checksum_method_authenticatedtransferresult_to_data() != 2336) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_routex_client_uniffi_checksum_method_routexclient_accounts() != 42833) {
+    if (uniffi_routex_client_uniffi_checksum_method_routexclient_accounts() != 8029) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_routex_client_uniffi_checksum_method_routexclient_balances() != 39399) {
@@ -3865,7 +3920,7 @@ private let initializationResult: InitializationResult = {
     if (uniffi_routex_client_uniffi_checksum_method_routexclient_confirm_transfer() != 21005) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_routex_client_uniffi_checksum_method_routexclient_info() != 44429) {
+    if (uniffi_routex_client_uniffi_checksum_method_routexclient_info() != 64998) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_routex_client_uniffi_checksum_method_routexclient_register_redirect_uri() != 3136) {
@@ -3886,7 +3941,7 @@ private let initializationResult: InitializationResult = {
     if (uniffi_routex_client_uniffi_checksum_method_routexclient_respond_transfer() != 64431) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_routex_client_uniffi_checksum_method_routexclient_search() != 25248) {
+    if (uniffi_routex_client_uniffi_checksum_method_routexclient_search() != 59087) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_routex_client_uniffi_checksum_method_routexclient_set_redirect_uri() != 22586) {
@@ -3895,7 +3950,7 @@ private let initializationResult: InitializationResult = {
     if (uniffi_routex_client_uniffi_checksum_method_routexclient_settle_key() != 17822) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_routex_client_uniffi_checksum_method_routexclient_system_version() != 42451) {
+    if (uniffi_routex_client_uniffi_checksum_method_routexclient_system_version() != 57787) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_routex_client_uniffi_checksum_method_routexclient_trace() != 49199) {
@@ -3907,7 +3962,7 @@ private let initializationResult: InitializationResult = {
     if (uniffi_routex_client_uniffi_checksum_method_routexclient_transactions() != 38307) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_routex_client_uniffi_checksum_method_routexclient_transfer() != 29451) {
+    if (uniffi_routex_client_uniffi_checksum_method_routexclient_transfer() != 7445) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_routex_client_uniffi_checksum_constructor_routexclient_new() != 13848) {

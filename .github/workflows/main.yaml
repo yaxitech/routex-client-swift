@@ -17,9 +17,17 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run tests
+        env:
+          KEY_ID: test
+          KEY: "${{ secrets.KEY }}"
+          ROUTEX_URL: "${{ secrets.ROUTEX_URL }}"
         run: |
+          echo "::notice::iOS simulator tests"
           xcodebuild test \
             -scheme routex-client-swift \
             -testPlan RoutexClientTests \
             -destination 'platform=iOS Simulator,OS=18.5,name=iPhone 16' \
-            KEY_ID=test KEY="${{ secrets.KEY }}" ROUTEX_URL="${{ secrets.ROUTEX_URL }}"
+            KEY_ID="$KEY_ID" KEY="$KEY" ROUTEX_URL="$ROUTEX_URL"
+
+          echo "::notice::macOS tests"
+          swift test

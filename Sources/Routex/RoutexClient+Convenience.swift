@@ -4,6 +4,6 @@ public extension RoutexClient {
     }
 
     convenience init(url: Url) {
-        self.init(distribution: "Swift", version: "0.2.0", url: url)
+        self.init(distribution: "Swift", version: "0.3.0", url: url)
     }
 }

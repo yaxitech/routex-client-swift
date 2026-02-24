@@ -51,15 +51,15 @@ struct Ticket<T: Codable & Sendable>: JWTPayload {
     }
 }
 
-func issueTicket<T: Codable & Sendable>(service: String, _ data: T = Null()) async throws -> (ticket: String, id: String) {
+func issueTicket<T: Codable & Sendable>(service: String, _ data: T = Null()) async throws -> (ticket: String, id: UUID) {
     let keys = JWTKeyCollection()
     let keyId = JWKIdentifier(string: ProcessInfo.processInfo.environment["KEY_ID"]!)
     let key = HMACKey(from: Data(base64Encoded: ProcessInfo.processInfo.environment["KEY"]!)!)
     await keys.add(hmac: key, digestAlgorithm: .sha256, kid: keyId)
     // Throw away decimals
     let expDateEpoch = Date(timeIntervalSinceNow: 10 * 60).timeIntervalSince1970.rounded(.towardZero)
-    let id = UUID().uuidString
+    let id = UUID()
     let ticket = Ticket(exp: ExpirationClaim(value: Date(timeIntervalSince1970: expDateEpoch)),
-                        data: ServiceData(id: id, service: service, data: data))
+                        data: ServiceData(id: id.uuidString, service: service, data: data))
     return (ticket: try await keys.sign(ticket, kid: keyId), id: id)
 }

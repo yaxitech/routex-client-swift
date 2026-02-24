@@ -515,6 +515,8 @@ public struct Amount: Equatable, Hashable {
     }
 
     
+
+    
 }
 
 #if compiler(>=6)
@@ -596,6 +598,8 @@ public struct CredentialsModel: Equatable, Hashable {
     }
 
     
+
+    
 }
 
 #if compiler(>=6)
@@ -648,6 +652,8 @@ public struct CreditorAddress: Equatable, Hashable {
         self.townName = townName
         self.country = country
     }
+
+    
 
     
 }
@@ -705,6 +711,8 @@ public struct DialogOption: Equatable, Hashable {
         self.label = label
         self.explanation = explanation
     }
+
+    
 
     
 }
@@ -779,6 +787,8 @@ public struct Fee: Equatable, Hashable {
         self.kind = kind
         self.bic = bic
     }
+
+    
 
     
 }
@@ -870,6 +880,8 @@ public struct Image: Equatable, Hashable {
     }
 
     
+
+    
 }
 
 #if compiler(>=6)
@@ -919,6 +931,8 @@ public enum AccountStatus: Equatable, Hashable {
     case available
     case terminated
     case blocked
+
+
 
 
 
@@ -1022,6 +1036,8 @@ public enum AccountType: Equatable, Hashable {
     case insurance
     case commerce
     case rewards
+
+
 
 
 
@@ -1137,6 +1153,8 @@ public enum ChargeBearer: Equatable, Hashable {
     case borneByCreditor
     case shared
     case followingServiceLevel
+
+
 
 
 
@@ -1259,6 +1277,8 @@ public enum DialogContext: Equatable, Hashable {
 
 
 
+
+
 }
 
 #if compiler(>=6)
@@ -1354,6 +1374,8 @@ public enum InputType: Equatable, Hashable {
 
 
 
+
+
 }
 
 #if compiler(>=6)
@@ -1434,6 +1456,8 @@ public enum PaymentErrorCode: Equatable, Hashable {
     
     case limitExceeded
     case insufficientFunds
+
+
 
 
 
@@ -1527,6 +1551,8 @@ public enum PaymentProduct: Equatable, Hashable {
 
 
 
+
+
 }
 
 #if compiler(>=6)
@@ -1615,6 +1641,8 @@ public enum ProviderErrorCode: Equatable, Hashable {
 
 
 
+
+
 }
 
 #if compiler(>=6)
@@ -1685,6 +1713,8 @@ public enum SecrecyLevel: Equatable, Hashable {
      * The data is a secret password. Input must be masked.
      */
     case password
+
+
 
 
 
@@ -1762,6 +1792,8 @@ public enum ServiceBlockedCode: Equatable, Hashable {
      * User attention is required via another channel. Typically the user needs to log into the Online Banking.
      */
     case actionRequired
+
+
 
 
 
@@ -1845,6 +1877,8 @@ public enum TransactionStatus: Equatable, Hashable {
      * The transaction has been canceled in some way.
      */
     case canceled
+
+
 
 
 
@@ -1938,6 +1972,8 @@ public enum UnsupportedProductReason: Equatable, Hashable {
      * Scheduled payments are not supported.
      */
     case scheduled
+
+
 
 
 

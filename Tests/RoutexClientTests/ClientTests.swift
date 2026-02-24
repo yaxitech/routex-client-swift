@@ -92,7 +92,7 @@ extension AccountField {
         throw WrongCase(expected: "Result", actual: response)
     }
     let data = result.result.toData()
-    #expect(data.ticketId == ticketId)
+    #expect(UUID(uuidString: data.ticketId)! == ticketId)
     #expect(data.data == [Account(iban: demoAccountIban, bic: "BYLADEM1001", currency: "EUR", ownerName: "Dr. Peter Steiger")])
 }
 
@@ -110,7 +110,7 @@ extension AccountField {
         throw WrongCase(expected: "Result", actual: response)
     }
     let data = result.result.toData()
-    #expect(data.ticketId == ticketId)
+    #expect(UUID(uuidString: data.ticketId)! == ticketId)
 }
 
 @Test func transfer() async throws {
@@ -136,5 +136,5 @@ extension AccountField {
         throw WrongCase(expected: "Result", actual: response)
     }
     let data = result.result.toData()
-    #expect(data.ticketId == ticketId)
+    #expect(UUID(uuidString: data.ticketId)! == ticketId)
 }

@@ -1,0 +1,25 @@
+module routex_apiFFI {
+    header "routex_apiFFI.h"
+    export *
+    use "Darwin"
+    use "_Builtin_stdbool"
+    use "_Builtin_stdint"
+}module routex_clientFFI {
+    header "routex_clientFFI.h"
+    export *
+    use "Darwin"
+    use "_Builtin_stdbool"
+    use "_Builtin_stdint"
+}module routex_client_commonFFI {
+    header "routex_client_commonFFI.h"
+    export *
+    use "Darwin"
+    use "_Builtin_stdbool"
+    use "_Builtin_stdint"
+}module routex_modelsFFI {
+    header "routex_modelsFFI.h"
+    export *
+    use "Darwin"
+    use "_Builtin_stdbool"
+    use "_Builtin_stdint"
+}
