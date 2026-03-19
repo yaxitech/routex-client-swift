@@ -47,3 +47,31 @@ func requireRedirectHandle<R>(
         throw WrongCase(expected: "RedirectHandle", actual: response)
     }
 }
+
+func requireDialog<R>(
+    _ response: BalancesResponse,
+    sourceLocation: SourceLocation = #_sourceLocation,
+    _ f: (DialogInput) async throws -> R
+) async throws -> R {
+    switch (response) {
+    case .dialog(context: _, message: _, image: _, input: let input):
+        return try await f(input)
+    default:
+        Issue.record("Expected Dialog, got \(response)", sourceLocation: sourceLocation)
+        throw WrongCase(expected: "Dialog", actual: response)
+    }
+}
+
+func requireDialog<R>(
+    _ response: TransactionsResponse,
+    sourceLocation: SourceLocation = #_sourceLocation,
+    _ f: (DialogInput) async throws -> R
+) async throws -> R {
+    switch (response) {
+    case .dialog(context: _, message: _, image: _, input: let input):
+        return try await f(input)
+    default:
+        Issue.record("Expected Dialog, got \(response)", sourceLocation: sourceLocation)
+        throw WrongCase(expected: "Dialog", actual: response)
+    }
+}

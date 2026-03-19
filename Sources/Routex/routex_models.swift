@@ -1271,7 +1271,7 @@ public enum DialogContext: Equatable, Hashable {
     /**
      * Pending Verification of Payee check.
      *
-     * A [`DialogInput::Confirmation`] gets returned with this context when a Verification of Payee check for a bulk payment is still pending.
+     * A [`DialogInput::Confirmation`] gets returned with this context when a Verification of Payee check is still pending.
      */
     case vopCheck
 

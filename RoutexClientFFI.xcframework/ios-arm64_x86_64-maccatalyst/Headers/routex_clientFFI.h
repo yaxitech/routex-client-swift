@@ -1,0 +1,943 @@
+#pragma once
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+
+// The following structs are used to implement the lowest level
+// of the FFI, and thus useful to multiple uniffied crates.
+// We ensure they are declared exactly once, with a header guard, UNIFFI_SHARED_H.
+#ifdef UNIFFI_SHARED_H
+    // We also try to prevent mixing versions of shared uniffi header structs.
+    // If you add anything to the #else block, you must increment the version suffix in UNIFFI_SHARED_HEADER_V4
+    #ifndef UNIFFI_SHARED_HEADER_V4
+        #error Combining helper code from multiple versions of uniffi is not supported
+    #endif // ndef UNIFFI_SHARED_HEADER_V4
+#else
+#define UNIFFI_SHARED_H
+#define UNIFFI_SHARED_HEADER_V4
+// ⚠️ Attention: If you change this #else block (ending in `#endif // def UNIFFI_SHARED_H`) you *must* ⚠️
+// ⚠️ increment the version suffix in all instances of UNIFFI_SHARED_HEADER_V4 in this file.           ⚠️
+
+typedef struct RustBuffer
+{
+    uint64_t capacity;
+    uint64_t len;
+    uint8_t *_Nullable data;
+} RustBuffer;
+
+typedef struct ForeignBytes
+{
+    int32_t len;
+    const uint8_t *_Nullable data;
+} ForeignBytes;
+
+// Error definitions
+typedef struct RustCallStatus {
+    int8_t code;
+    RustBuffer errorBuf;
+} RustCallStatus;
+
+// ⚠️ Attention: If you change this #else block (ending in `#endif // def UNIFFI_SHARED_H`) you *must* ⚠️
+// ⚠️ increment the version suffix in all instances of UNIFFI_SHARED_HEADER_V4 in this file.           ⚠️
+#endif // def UNIFFI_SHARED_H
+#ifndef UNIFFI_FFIDEF_RUST_FUTURE_CONTINUATION_CALLBACK
+#define UNIFFI_FFIDEF_RUST_FUTURE_CONTINUATION_CALLBACK
+typedef void (*UniffiRustFutureContinuationCallback)(uint64_t, int8_t
+    );
+
+#endif
+#ifndef UNIFFI_FFIDEF_FOREIGN_FUTURE_DROPPED_CALLBACK
+#define UNIFFI_FFIDEF_FOREIGN_FUTURE_DROPPED_CALLBACK
+typedef void (*UniffiForeignFutureDroppedCallback)(uint64_t
+    );
+
+#endif
+#ifndef UNIFFI_FFIDEF_CALLBACK_INTERFACE_FREE
+#define UNIFFI_FFIDEF_CALLBACK_INTERFACE_FREE
+typedef void (*UniffiCallbackInterfaceFree)(uint64_t
+    );
+
+#endif
+#ifndef UNIFFI_FFIDEF_CALLBACK_INTERFACE_CLONE
+#define UNIFFI_FFIDEF_CALLBACK_INTERFACE_CLONE
+typedef uint64_t (*UniffiCallbackInterfaceClone)(uint64_t
+    );
+
+#endif
+#ifndef UNIFFI_FFIDEF_FOREIGN_FUTURE_DROPPED_CALLBACK_STRUCT
+#define UNIFFI_FFIDEF_FOREIGN_FUTURE_DROPPED_CALLBACK_STRUCT
+typedef struct UniffiForeignFutureDroppedCallbackStruct {
+    uint64_t handle;
+    UniffiForeignFutureDroppedCallback _Nonnull free;
+} UniffiForeignFutureDroppedCallbackStruct;
+
+#endif
+#ifndef UNIFFI_FFIDEF_FOREIGN_FUTURE_RESULT_U8
+#define UNIFFI_FFIDEF_FOREIGN_FUTURE_RESULT_U8
+typedef struct UniffiForeignFutureResultU8 {
+    uint8_t returnValue;
+    RustCallStatus callStatus;
+} UniffiForeignFutureResultU8;
+
+#endif
+#ifndef UNIFFI_FFIDEF_FOREIGN_FUTURE_COMPLETE_U8
+#define UNIFFI_FFIDEF_FOREIGN_FUTURE_COMPLETE_U8
+typedef void (*UniffiForeignFutureCompleteU8)(uint64_t, UniffiForeignFutureResultU8
+    );
+
+#endif
+#ifndef UNIFFI_FFIDEF_FOREIGN_FUTURE_RESULT_I8
+#define UNIFFI_FFIDEF_FOREIGN_FUTURE_RESULT_I8
+typedef struct UniffiForeignFutureResultI8 {
+    int8_t returnValue;
+    RustCallStatus callStatus;
+} UniffiForeignFutureResultI8;
+
+#endif
+#ifndef UNIFFI_FFIDEF_FOREIGN_FUTURE_COMPLETE_I8
+#define UNIFFI_FFIDEF_FOREIGN_FUTURE_COMPLETE_I8
+typedef void (*UniffiForeignFutureCompleteI8)(uint64_t, UniffiForeignFutureResultI8
+    );
+
+#endif
+#ifndef UNIFFI_FFIDEF_FOREIGN_FUTURE_RESULT_U16
+#define UNIFFI_FFIDEF_FOREIGN_FUTURE_RESULT_U16
+typedef struct UniffiForeignFutureResultU16 {
+    uint16_t returnValue;
+    RustCallStatus callStatus;
+} UniffiForeignFutureResultU16;
+
+#endif
+#ifndef UNIFFI_FFIDEF_FOREIGN_FUTURE_COMPLETE_U16
+#define UNIFFI_FFIDEF_FOREIGN_FUTURE_COMPLETE_U16
+typedef void (*UniffiForeignFutureCompleteU16)(uint64_t, UniffiForeignFutureResultU16
+    );
+
+#endif
+#ifndef UNIFFI_FFIDEF_FOREIGN_FUTURE_RESULT_I16
+#define UNIFFI_FFIDEF_FOREIGN_FUTURE_RESULT_I16
+typedef struct UniffiForeignFutureResultI16 {
+    int16_t returnValue;
+    RustCallStatus callStatus;
+} UniffiForeignFutureResultI16;
+
+#endif
+#ifndef UNIFFI_FFIDEF_FOREIGN_FUTURE_COMPLETE_I16
+#define UNIFFI_FFIDEF_FOREIGN_FUTURE_COMPLETE_I16
+typedef void (*UniffiForeignFutureCompleteI16)(uint64_t, UniffiForeignFutureResultI16
+    );
+
+#endif
+#ifndef UNIFFI_FFIDEF_FOREIGN_FUTURE_RESULT_U32
+#define UNIFFI_FFIDEF_FOREIGN_FUTURE_RESULT_U32
+typedef struct UniffiForeignFutureResultU32 {
+    uint32_t returnValue;
+    RustCallStatus callStatus;
+} UniffiForeignFutureResultU32;
+
+#endif
+#ifndef UNIFFI_FFIDEF_FOREIGN_FUTURE_COMPLETE_U32
+#define UNIFFI_FFIDEF_FOREIGN_FUTURE_COMPLETE_U32
+typedef void (*UniffiForeignFutureCompleteU32)(uint64_t, UniffiForeignFutureResultU32
+    );
+
+#endif
+#ifndef UNIFFI_FFIDEF_FOREIGN_FUTURE_RESULT_I32
+#define UNIFFI_FFIDEF_FOREIGN_FUTURE_RESULT_I32
+typedef struct UniffiForeignFutureResultI32 {
+    int32_t returnValue;
+    RustCallStatus callStatus;
+} UniffiForeignFutureResultI32;
+
+#endif
+#ifndef UNIFFI_FFIDEF_FOREIGN_FUTURE_COMPLETE_I32
+#define UNIFFI_FFIDEF_FOREIGN_FUTURE_COMPLETE_I32
+typedef void (*UniffiForeignFutureCompleteI32)(uint64_t, UniffiForeignFutureResultI32
+    );
+
+#endif
+#ifndef UNIFFI_FFIDEF_FOREIGN_FUTURE_RESULT_U64
+#define UNIFFI_FFIDEF_FOREIGN_FUTURE_RESULT_U64
+typedef struct UniffiForeignFutureResultU64 {
+    uint64_t returnValue;
+    RustCallStatus callStatus;
+} UniffiForeignFutureResultU64;
+
+#endif
+#ifndef UNIFFI_FFIDEF_FOREIGN_FUTURE_COMPLETE_U64
+#define UNIFFI_FFIDEF_FOREIGN_FUTURE_COMPLETE_U64
+typedef void (*UniffiForeignFutureCompleteU64)(uint64_t, UniffiForeignFutureResultU64
+    );
+
+#endif
+#ifndef UNIFFI_FFIDEF_FOREIGN_FUTURE_RESULT_I64
+#define UNIFFI_FFIDEF_FOREIGN_FUTURE_RESULT_I64
+typedef struct UniffiForeignFutureResultI64 {
+    int64_t returnValue;
+    RustCallStatus callStatus;
+} UniffiForeignFutureResultI64;
+
+#endif
+#ifndef UNIFFI_FFIDEF_FOREIGN_FUTURE_COMPLETE_I64
+#define UNIFFI_FFIDEF_FOREIGN_FUTURE_COMPLETE_I64
+typedef void (*UniffiForeignFutureCompleteI64)(uint64_t, UniffiForeignFutureResultI64
+    );
+
+#endif
+#ifndef UNIFFI_FFIDEF_FOREIGN_FUTURE_RESULT_F32
+#define UNIFFI_FFIDEF_FOREIGN_FUTURE_RESULT_F32
+typedef struct UniffiForeignFutureResultF32 {
+    float returnValue;
+    RustCallStatus callStatus;
+} UniffiForeignFutureResultF32;
+
+#endif
+#ifndef UNIFFI_FFIDEF_FOREIGN_FUTURE_COMPLETE_F32
+#define UNIFFI_FFIDEF_FOREIGN_FUTURE_COMPLETE_F32
+typedef void (*UniffiForeignFutureCompleteF32)(uint64_t, UniffiForeignFutureResultF32
+    );
+
+#endif
+#ifndef UNIFFI_FFIDEF_FOREIGN_FUTURE_RESULT_F64
+#define UNIFFI_FFIDEF_FOREIGN_FUTURE_RESULT_F64
+typedef struct UniffiForeignFutureResultF64 {
+    double returnValue;
+    RustCallStatus callStatus;
+} UniffiForeignFutureResultF64;
+
+#endif
+#ifndef UNIFFI_FFIDEF_FOREIGN_FUTURE_COMPLETE_F64
+#define UNIFFI_FFIDEF_FOREIGN_FUTURE_COMPLETE_F64
+typedef void (*UniffiForeignFutureCompleteF64)(uint64_t, UniffiForeignFutureResultF64
+    );
+
+#endif
+#ifndef UNIFFI_FFIDEF_FOREIGN_FUTURE_RESULT_RUST_BUFFER
+#define UNIFFI_FFIDEF_FOREIGN_FUTURE_RESULT_RUST_BUFFER
+typedef struct UniffiForeignFutureResultRustBuffer {
+    RustBuffer returnValue;
+    RustCallStatus callStatus;
+} UniffiForeignFutureResultRustBuffer;
+
+#endif
+#ifndef UNIFFI_FFIDEF_FOREIGN_FUTURE_COMPLETE_RUST_BUFFER
+#define UNIFFI_FFIDEF_FOREIGN_FUTURE_COMPLETE_RUST_BUFFER
+typedef void (*UniffiForeignFutureCompleteRustBuffer)(uint64_t, UniffiForeignFutureResultRustBuffer
+    );
+
+#endif
+#ifndef UNIFFI_FFIDEF_FOREIGN_FUTURE_RESULT_VOID
+#define UNIFFI_FFIDEF_FOREIGN_FUTURE_RESULT_VOID
+typedef struct UniffiForeignFutureResultVoid {
+    RustCallStatus callStatus;
+} UniffiForeignFutureResultVoid;
+
+#endif
+#ifndef UNIFFI_FFIDEF_FOREIGN_FUTURE_COMPLETE_VOID
+#define UNIFFI_FFIDEF_FOREIGN_FUTURE_COMPLETE_VOID
+typedef void (*UniffiForeignFutureCompleteVoid)(uint64_t, UniffiForeignFutureResultVoid
+    );
+
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_CLONE_AUTHENTICATEDACCOUNTSRESULT
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_CLONE_AUTHENTICATEDACCOUNTSRESULT
+uint64_t uniffi_routex_client_uniffi_fn_clone_authenticatedaccountsresult(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_FREE_AUTHENTICATEDACCOUNTSRESULT
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_FREE_AUTHENTICATEDACCOUNTSRESULT
+void uniffi_routex_client_uniffi_fn_free_authenticatedaccountsresult(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_AUTHENTICATEDACCOUNTSRESULT_JWT
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_AUTHENTICATEDACCOUNTSRESULT_JWT
+RustBuffer uniffi_routex_client_uniffi_fn_method_authenticatedaccountsresult_jwt(uint64_t ptr, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_AUTHENTICATEDACCOUNTSRESULT_TO_DATA
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_AUTHENTICATEDACCOUNTSRESULT_TO_DATA
+RustBuffer uniffi_routex_client_uniffi_fn_method_authenticatedaccountsresult_to_data(uint64_t ptr, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_CLONE_AUTHENTICATEDBALANCESRESULT
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_CLONE_AUTHENTICATEDBALANCESRESULT
+uint64_t uniffi_routex_client_uniffi_fn_clone_authenticatedbalancesresult(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_FREE_AUTHENTICATEDBALANCESRESULT
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_FREE_AUTHENTICATEDBALANCESRESULT
+void uniffi_routex_client_uniffi_fn_free_authenticatedbalancesresult(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_AUTHENTICATEDBALANCESRESULT_JWT
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_AUTHENTICATEDBALANCESRESULT_JWT
+RustBuffer uniffi_routex_client_uniffi_fn_method_authenticatedbalancesresult_jwt(uint64_t ptr, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_AUTHENTICATEDBALANCESRESULT_TO_DATA
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_AUTHENTICATEDBALANCESRESULT_TO_DATA
+RustBuffer uniffi_routex_client_uniffi_fn_method_authenticatedbalancesresult_to_data(uint64_t ptr, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_CLONE_AUTHENTICATEDCOLLECTPAYMENTRESULT
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_CLONE_AUTHENTICATEDCOLLECTPAYMENTRESULT
+uint64_t uniffi_routex_client_uniffi_fn_clone_authenticatedcollectpaymentresult(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_FREE_AUTHENTICATEDCOLLECTPAYMENTRESULT
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_FREE_AUTHENTICATEDCOLLECTPAYMENTRESULT
+void uniffi_routex_client_uniffi_fn_free_authenticatedcollectpaymentresult(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_AUTHENTICATEDCOLLECTPAYMENTRESULT_JWT
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_AUTHENTICATEDCOLLECTPAYMENTRESULT_JWT
+RustBuffer uniffi_routex_client_uniffi_fn_method_authenticatedcollectpaymentresult_jwt(uint64_t ptr, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_AUTHENTICATEDCOLLECTPAYMENTRESULT_TO_DATA
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_AUTHENTICATEDCOLLECTPAYMENTRESULT_TO_DATA
+RustBuffer uniffi_routex_client_uniffi_fn_method_authenticatedcollectpaymentresult_to_data(uint64_t ptr, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_CLONE_AUTHENTICATEDTRANSACTIONSRESULT
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_CLONE_AUTHENTICATEDTRANSACTIONSRESULT
+uint64_t uniffi_routex_client_uniffi_fn_clone_authenticatedtransactionsresult(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_FREE_AUTHENTICATEDTRANSACTIONSRESULT
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_FREE_AUTHENTICATEDTRANSACTIONSRESULT
+void uniffi_routex_client_uniffi_fn_free_authenticatedtransactionsresult(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_AUTHENTICATEDTRANSACTIONSRESULT_JWT
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_AUTHENTICATEDTRANSACTIONSRESULT_JWT
+RustBuffer uniffi_routex_client_uniffi_fn_method_authenticatedtransactionsresult_jwt(uint64_t ptr, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_AUTHENTICATEDTRANSACTIONSRESULT_TO_DATA
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_AUTHENTICATEDTRANSACTIONSRESULT_TO_DATA
+RustBuffer uniffi_routex_client_uniffi_fn_method_authenticatedtransactionsresult_to_data(uint64_t ptr, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_CLONE_AUTHENTICATEDTRANSFERRESULT
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_CLONE_AUTHENTICATEDTRANSFERRESULT
+uint64_t uniffi_routex_client_uniffi_fn_clone_authenticatedtransferresult(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_FREE_AUTHENTICATEDTRANSFERRESULT
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_FREE_AUTHENTICATEDTRANSFERRESULT
+void uniffi_routex_client_uniffi_fn_free_authenticatedtransferresult(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_AUTHENTICATEDTRANSFERRESULT_JWT
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_AUTHENTICATEDTRANSFERRESULT_JWT
+RustBuffer uniffi_routex_client_uniffi_fn_method_authenticatedtransferresult_jwt(uint64_t ptr, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_AUTHENTICATEDTRANSFERRESULT_TO_DATA
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_AUTHENTICATEDTRANSFERRESULT_TO_DATA
+RustBuffer uniffi_routex_client_uniffi_fn_method_authenticatedtransferresult_to_data(uint64_t ptr, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_CLONE_ROUTEXCLIENT
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_CLONE_ROUTEXCLIENT
+uint64_t uniffi_routex_client_uniffi_fn_clone_routexclient(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_FREE_ROUTEXCLIENT
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_FREE_ROUTEXCLIENT
+void uniffi_routex_client_uniffi_fn_free_routexclient(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_CONSTRUCTOR_ROUTEXCLIENT_NEW
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_CONSTRUCTOR_ROUTEXCLIENT_NEW
+uint64_t uniffi_routex_client_uniffi_fn_constructor_routexclient_new(RustBuffer distribution, RustBuffer version, RustBuffer url, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_ACCOUNTS
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_ACCOUNTS
+uint64_t uniffi_routex_client_uniffi_fn_method_routexclient_accounts(uint64_t ptr, RustBuffer credentials, RustBuffer session, RustBuffer recurring_consents, RustBuffer ticket, RustBuffer fields, RustBuffer filter
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_BALANCES
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_BALANCES
+uint64_t uniffi_routex_client_uniffi_fn_method_routexclient_balances(uint64_t ptr, RustBuffer credentials, RustBuffer session, RustBuffer recurring_consents, RustBuffer ticket, RustBuffer accounts
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_COLLECT_PAYMENT
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_COLLECT_PAYMENT
+uint64_t uniffi_routex_client_uniffi_fn_method_routexclient_collect_payment(uint64_t ptr, RustBuffer credentials, RustBuffer session, RustBuffer recurring_consents, RustBuffer ticket, RustBuffer account
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_CONFIRM_ACCOUNTS
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_CONFIRM_ACCOUNTS
+uint64_t uniffi_routex_client_uniffi_fn_method_routexclient_confirm_accounts(uint64_t ptr, RustBuffer ticket, RustBuffer context
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_CONFIRM_BALANCES
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_CONFIRM_BALANCES
+uint64_t uniffi_routex_client_uniffi_fn_method_routexclient_confirm_balances(uint64_t ptr, RustBuffer ticket, RustBuffer context
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_CONFIRM_COLLECT_PAYMENT
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_CONFIRM_COLLECT_PAYMENT
+uint64_t uniffi_routex_client_uniffi_fn_method_routexclient_confirm_collect_payment(uint64_t ptr, RustBuffer ticket, RustBuffer context
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_CONFIRM_TRANSACTIONS
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_CONFIRM_TRANSACTIONS
+uint64_t uniffi_routex_client_uniffi_fn_method_routexclient_confirm_transactions(uint64_t ptr, RustBuffer ticket, RustBuffer context
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_CONFIRM_TRANSFER
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_CONFIRM_TRANSFER
+uint64_t uniffi_routex_client_uniffi_fn_method_routexclient_confirm_transfer(uint64_t ptr, RustBuffer ticket, RustBuffer context
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_INFO
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_INFO
+uint64_t uniffi_routex_client_uniffi_fn_method_routexclient_info(uint64_t ptr, RustBuffer ticket, RustBuffer connection_id
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_REGISTER_REDIRECT_URI
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_REGISTER_REDIRECT_URI
+uint64_t uniffi_routex_client_uniffi_fn_method_routexclient_register_redirect_uri(uint64_t ptr, RustBuffer ticket, RustBuffer handle, RustBuffer redirect_uri
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_RESPOND_ACCOUNTS
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_RESPOND_ACCOUNTS
+uint64_t uniffi_routex_client_uniffi_fn_method_routexclient_respond_accounts(uint64_t ptr, RustBuffer ticket, RustBuffer context, RustBuffer response
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_RESPOND_BALANCES
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_RESPOND_BALANCES
+uint64_t uniffi_routex_client_uniffi_fn_method_routexclient_respond_balances(uint64_t ptr, RustBuffer ticket, RustBuffer context, RustBuffer response
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_RESPOND_COLLECT_PAYMENT
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_RESPOND_COLLECT_PAYMENT
+uint64_t uniffi_routex_client_uniffi_fn_method_routexclient_respond_collect_payment(uint64_t ptr, RustBuffer ticket, RustBuffer context, RustBuffer response
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_RESPOND_TRANSACTIONS
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_RESPOND_TRANSACTIONS
+uint64_t uniffi_routex_client_uniffi_fn_method_routexclient_respond_transactions(uint64_t ptr, RustBuffer ticket, RustBuffer context, RustBuffer response
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_RESPOND_TRANSFER
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_RESPOND_TRANSFER
+uint64_t uniffi_routex_client_uniffi_fn_method_routexclient_respond_transfer(uint64_t ptr, RustBuffer ticket, RustBuffer context, RustBuffer response
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_SEARCH
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_SEARCH
+uint64_t uniffi_routex_client_uniffi_fn_method_routexclient_search(uint64_t ptr, RustBuffer ticket, RustBuffer filters, int8_t iban_detection, RustBuffer limit
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_SET_REDIRECT_URI
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_SET_REDIRECT_URI
+void uniffi_routex_client_uniffi_fn_method_routexclient_set_redirect_uri(uint64_t ptr, RustBuffer redirect_uri, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_SETTLE_KEY
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_SETTLE_KEY
+uint64_t uniffi_routex_client_uniffi_fn_method_routexclient_settle_key(uint64_t ptr, RustBuffer ticket
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_SYSTEM_VERSION
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_SYSTEM_VERSION
+uint64_t uniffi_routex_client_uniffi_fn_method_routexclient_system_version(uint64_t ptr, RustBuffer ticket_id
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_TRACE
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_TRACE
+uint64_t uniffi_routex_client_uniffi_fn_method_routexclient_trace(uint64_t ptr, RustBuffer ticket, RustBuffer trace_id
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_TRACE_ID
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_TRACE_ID
+RustBuffer uniffi_routex_client_uniffi_fn_method_routexclient_trace_id(uint64_t ptr, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_TRANSACTIONS
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_TRANSACTIONS
+uint64_t uniffi_routex_client_uniffi_fn_method_routexclient_transactions(uint64_t ptr, RustBuffer credentials, RustBuffer session, RustBuffer recurring_consents, RustBuffer ticket
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_TRANSFER
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_TRANSFER
+uint64_t uniffi_routex_client_uniffi_fn_method_routexclient_transfer(uint64_t ptr, RustBuffer credentials, RustBuffer session, RustBuffer recurring_consents, RustBuffer ticket, RustBuffer product, RustBuffer details, RustBuffer debtor_account, RustBuffer debtor_name, RustBuffer requested_execution_date
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUSTBUFFER_ALLOC
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUSTBUFFER_ALLOC
+RustBuffer ffi_routex_client_uniffi_rustbuffer_alloc(uint64_t size, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUSTBUFFER_FROM_BYTES
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUSTBUFFER_FROM_BYTES
+RustBuffer ffi_routex_client_uniffi_rustbuffer_from_bytes(ForeignBytes bytes, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUSTBUFFER_FREE
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUSTBUFFER_FREE
+void ffi_routex_client_uniffi_rustbuffer_free(RustBuffer buf, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUSTBUFFER_RESERVE
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUSTBUFFER_RESERVE
+RustBuffer ffi_routex_client_uniffi_rustbuffer_reserve(RustBuffer buf, uint64_t additional, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_POLL_U8
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_POLL_U8
+void ffi_routex_client_uniffi_rust_future_poll_u8(uint64_t handle, UniffiRustFutureContinuationCallback _Nonnull callback, uint64_t callback_data
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_CANCEL_U8
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_CANCEL_U8
+void ffi_routex_client_uniffi_rust_future_cancel_u8(uint64_t handle
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_FREE_U8
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_FREE_U8
+void ffi_routex_client_uniffi_rust_future_free_u8(uint64_t handle
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_COMPLETE_U8
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_COMPLETE_U8
+uint8_t ffi_routex_client_uniffi_rust_future_complete_u8(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_POLL_I8
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_POLL_I8
+void ffi_routex_client_uniffi_rust_future_poll_i8(uint64_t handle, UniffiRustFutureContinuationCallback _Nonnull callback, uint64_t callback_data
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_CANCEL_I8
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_CANCEL_I8
+void ffi_routex_client_uniffi_rust_future_cancel_i8(uint64_t handle
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_FREE_I8
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_FREE_I8
+void ffi_routex_client_uniffi_rust_future_free_i8(uint64_t handle
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_COMPLETE_I8
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_COMPLETE_I8
+int8_t ffi_routex_client_uniffi_rust_future_complete_i8(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_POLL_U16
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_POLL_U16
+void ffi_routex_client_uniffi_rust_future_poll_u16(uint64_t handle, UniffiRustFutureContinuationCallback _Nonnull callback, uint64_t callback_data
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_CANCEL_U16
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_CANCEL_U16
+void ffi_routex_client_uniffi_rust_future_cancel_u16(uint64_t handle
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_FREE_U16
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_FREE_U16
+void ffi_routex_client_uniffi_rust_future_free_u16(uint64_t handle
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_COMPLETE_U16
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_COMPLETE_U16
+uint16_t ffi_routex_client_uniffi_rust_future_complete_u16(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_POLL_I16
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_POLL_I16
+void ffi_routex_client_uniffi_rust_future_poll_i16(uint64_t handle, UniffiRustFutureContinuationCallback _Nonnull callback, uint64_t callback_data
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_CANCEL_I16
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_CANCEL_I16
+void ffi_routex_client_uniffi_rust_future_cancel_i16(uint64_t handle
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_FREE_I16
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_FREE_I16
+void ffi_routex_client_uniffi_rust_future_free_i16(uint64_t handle
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_COMPLETE_I16
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_COMPLETE_I16
+int16_t ffi_routex_client_uniffi_rust_future_complete_i16(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_POLL_U32
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_POLL_U32
+void ffi_routex_client_uniffi_rust_future_poll_u32(uint64_t handle, UniffiRustFutureContinuationCallback _Nonnull callback, uint64_t callback_data
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_CANCEL_U32
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_CANCEL_U32
+void ffi_routex_client_uniffi_rust_future_cancel_u32(uint64_t handle
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_FREE_U32
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_FREE_U32
+void ffi_routex_client_uniffi_rust_future_free_u32(uint64_t handle
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_COMPLETE_U32
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_COMPLETE_U32
+uint32_t ffi_routex_client_uniffi_rust_future_complete_u32(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_POLL_I32
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_POLL_I32
+void ffi_routex_client_uniffi_rust_future_poll_i32(uint64_t handle, UniffiRustFutureContinuationCallback _Nonnull callback, uint64_t callback_data
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_CANCEL_I32
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_CANCEL_I32
+void ffi_routex_client_uniffi_rust_future_cancel_i32(uint64_t handle
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_FREE_I32
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_FREE_I32
+void ffi_routex_client_uniffi_rust_future_free_i32(uint64_t handle
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_COMPLETE_I32
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_COMPLETE_I32
+int32_t ffi_routex_client_uniffi_rust_future_complete_i32(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_POLL_U64
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_POLL_U64
+void ffi_routex_client_uniffi_rust_future_poll_u64(uint64_t handle, UniffiRustFutureContinuationCallback _Nonnull callback, uint64_t callback_data
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_CANCEL_U64
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_CANCEL_U64
+void ffi_routex_client_uniffi_rust_future_cancel_u64(uint64_t handle
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_FREE_U64
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_FREE_U64
+void ffi_routex_client_uniffi_rust_future_free_u64(uint64_t handle
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_COMPLETE_U64
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_COMPLETE_U64
+uint64_t ffi_routex_client_uniffi_rust_future_complete_u64(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_POLL_I64
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_POLL_I64
+void ffi_routex_client_uniffi_rust_future_poll_i64(uint64_t handle, UniffiRustFutureContinuationCallback _Nonnull callback, uint64_t callback_data
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_CANCEL_I64
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_CANCEL_I64
+void ffi_routex_client_uniffi_rust_future_cancel_i64(uint64_t handle
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_FREE_I64
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_FREE_I64
+void ffi_routex_client_uniffi_rust_future_free_i64(uint64_t handle
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_COMPLETE_I64
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_COMPLETE_I64
+int64_t ffi_routex_client_uniffi_rust_future_complete_i64(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_POLL_F32
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_POLL_F32
+void ffi_routex_client_uniffi_rust_future_poll_f32(uint64_t handle, UniffiRustFutureContinuationCallback _Nonnull callback, uint64_t callback_data
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_CANCEL_F32
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_CANCEL_F32
+void ffi_routex_client_uniffi_rust_future_cancel_f32(uint64_t handle
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_FREE_F32
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_FREE_F32
+void ffi_routex_client_uniffi_rust_future_free_f32(uint64_t handle
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_COMPLETE_F32
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_COMPLETE_F32
+float ffi_routex_client_uniffi_rust_future_complete_f32(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_POLL_F64
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_POLL_F64
+void ffi_routex_client_uniffi_rust_future_poll_f64(uint64_t handle, UniffiRustFutureContinuationCallback _Nonnull callback, uint64_t callback_data
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_CANCEL_F64
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_CANCEL_F64
+void ffi_routex_client_uniffi_rust_future_cancel_f64(uint64_t handle
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_FREE_F64
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_FREE_F64
+void ffi_routex_client_uniffi_rust_future_free_f64(uint64_t handle
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_COMPLETE_F64
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_COMPLETE_F64
+double ffi_routex_client_uniffi_rust_future_complete_f64(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_POLL_RUST_BUFFER
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_POLL_RUST_BUFFER
+void ffi_routex_client_uniffi_rust_future_poll_rust_buffer(uint64_t handle, UniffiRustFutureContinuationCallback _Nonnull callback, uint64_t callback_data
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_CANCEL_RUST_BUFFER
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_CANCEL_RUST_BUFFER
+void ffi_routex_client_uniffi_rust_future_cancel_rust_buffer(uint64_t handle
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_FREE_RUST_BUFFER
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_FREE_RUST_BUFFER
+void ffi_routex_client_uniffi_rust_future_free_rust_buffer(uint64_t handle
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_COMPLETE_RUST_BUFFER
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_COMPLETE_RUST_BUFFER
+RustBuffer ffi_routex_client_uniffi_rust_future_complete_rust_buffer(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_POLL_VOID
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_POLL_VOID
+void ffi_routex_client_uniffi_rust_future_poll_void(uint64_t handle, UniffiRustFutureContinuationCallback _Nonnull callback, uint64_t callback_data
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_CANCEL_VOID
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_CANCEL_VOID
+void ffi_routex_client_uniffi_rust_future_cancel_void(uint64_t handle
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_FREE_VOID
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_FREE_VOID
+void ffi_routex_client_uniffi_rust_future_free_void(uint64_t handle
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_COMPLETE_VOID
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_RUST_FUTURE_COMPLETE_VOID
+void ffi_routex_client_uniffi_rust_future_complete_void(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_AUTHENTICATEDACCOUNTSRESULT_JWT
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_AUTHENTICATEDACCOUNTSRESULT_JWT
+uint16_t uniffi_routex_client_uniffi_checksum_method_authenticatedaccountsresult_jwt(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_AUTHENTICATEDACCOUNTSRESULT_TO_DATA
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_AUTHENTICATEDACCOUNTSRESULT_TO_DATA
+uint16_t uniffi_routex_client_uniffi_checksum_method_authenticatedaccountsresult_to_data(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_AUTHENTICATEDBALANCESRESULT_JWT
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_AUTHENTICATEDBALANCESRESULT_JWT
+uint16_t uniffi_routex_client_uniffi_checksum_method_authenticatedbalancesresult_jwt(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_AUTHENTICATEDBALANCESRESULT_TO_DATA
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_AUTHENTICATEDBALANCESRESULT_TO_DATA
+uint16_t uniffi_routex_client_uniffi_checksum_method_authenticatedbalancesresult_to_data(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_AUTHENTICATEDCOLLECTPAYMENTRESULT_JWT
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_AUTHENTICATEDCOLLECTPAYMENTRESULT_JWT
+uint16_t uniffi_routex_client_uniffi_checksum_method_authenticatedcollectpaymentresult_jwt(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_AUTHENTICATEDCOLLECTPAYMENTRESULT_TO_DATA
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_AUTHENTICATEDCOLLECTPAYMENTRESULT_TO_DATA
+uint16_t uniffi_routex_client_uniffi_checksum_method_authenticatedcollectpaymentresult_to_data(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_AUTHENTICATEDTRANSACTIONSRESULT_JWT
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_AUTHENTICATEDTRANSACTIONSRESULT_JWT
+uint16_t uniffi_routex_client_uniffi_checksum_method_authenticatedtransactionsresult_jwt(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_AUTHENTICATEDTRANSACTIONSRESULT_TO_DATA
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_AUTHENTICATEDTRANSACTIONSRESULT_TO_DATA
+uint16_t uniffi_routex_client_uniffi_checksum_method_authenticatedtransactionsresult_to_data(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_AUTHENTICATEDTRANSFERRESULT_JWT
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_AUTHENTICATEDTRANSFERRESULT_JWT
+uint16_t uniffi_routex_client_uniffi_checksum_method_authenticatedtransferresult_jwt(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_AUTHENTICATEDTRANSFERRESULT_TO_DATA
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_AUTHENTICATEDTRANSFERRESULT_TO_DATA
+uint16_t uniffi_routex_client_uniffi_checksum_method_authenticatedtransferresult_to_data(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_ACCOUNTS
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_ACCOUNTS
+uint16_t uniffi_routex_client_uniffi_checksum_method_routexclient_accounts(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_BALANCES
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_BALANCES
+uint16_t uniffi_routex_client_uniffi_checksum_method_routexclient_balances(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_COLLECT_PAYMENT
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_COLLECT_PAYMENT
+uint16_t uniffi_routex_client_uniffi_checksum_method_routexclient_collect_payment(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_CONFIRM_ACCOUNTS
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_CONFIRM_ACCOUNTS
+uint16_t uniffi_routex_client_uniffi_checksum_method_routexclient_confirm_accounts(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_CONFIRM_BALANCES
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_CONFIRM_BALANCES
+uint16_t uniffi_routex_client_uniffi_checksum_method_routexclient_confirm_balances(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_CONFIRM_COLLECT_PAYMENT
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_CONFIRM_COLLECT_PAYMENT
+uint16_t uniffi_routex_client_uniffi_checksum_method_routexclient_confirm_collect_payment(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_CONFIRM_TRANSACTIONS
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_CONFIRM_TRANSACTIONS
+uint16_t uniffi_routex_client_uniffi_checksum_method_routexclient_confirm_transactions(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_CONFIRM_TRANSFER
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_CONFIRM_TRANSFER
+uint16_t uniffi_routex_client_uniffi_checksum_method_routexclient_confirm_transfer(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_INFO
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_INFO
+uint16_t uniffi_routex_client_uniffi_checksum_method_routexclient_info(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_REGISTER_REDIRECT_URI
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_REGISTER_REDIRECT_URI
+uint16_t uniffi_routex_client_uniffi_checksum_method_routexclient_register_redirect_uri(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_RESPOND_ACCOUNTS
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_RESPOND_ACCOUNTS
+uint16_t uniffi_routex_client_uniffi_checksum_method_routexclient_respond_accounts(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_RESPOND_BALANCES
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_RESPOND_BALANCES
+uint16_t uniffi_routex_client_uniffi_checksum_method_routexclient_respond_balances(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_RESPOND_COLLECT_PAYMENT
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_RESPOND_COLLECT_PAYMENT
+uint16_t uniffi_routex_client_uniffi_checksum_method_routexclient_respond_collect_payment(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_RESPOND_TRANSACTIONS
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_RESPOND_TRANSACTIONS
+uint16_t uniffi_routex_client_uniffi_checksum_method_routexclient_respond_transactions(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_RESPOND_TRANSFER
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_RESPOND_TRANSFER
+uint16_t uniffi_routex_client_uniffi_checksum_method_routexclient_respond_transfer(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_SEARCH
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_SEARCH
+uint16_t uniffi_routex_client_uniffi_checksum_method_routexclient_search(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_SET_REDIRECT_URI
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_SET_REDIRECT_URI
+uint16_t uniffi_routex_client_uniffi_checksum_method_routexclient_set_redirect_uri(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_SETTLE_KEY
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_SETTLE_KEY
+uint16_t uniffi_routex_client_uniffi_checksum_method_routexclient_settle_key(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_SYSTEM_VERSION
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_SYSTEM_VERSION
+uint16_t uniffi_routex_client_uniffi_checksum_method_routexclient_system_version(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_TRACE
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_TRACE
+uint16_t uniffi_routex_client_uniffi_checksum_method_routexclient_trace(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_TRACE_ID
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_TRACE_ID
+uint16_t uniffi_routex_client_uniffi_checksum_method_routexclient_trace_id(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_TRANSACTIONS
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_TRANSACTIONS
+uint16_t uniffi_routex_client_uniffi_checksum_method_routexclient_transactions(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_TRANSFER
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_METHOD_ROUTEXCLIENT_TRANSFER
+uint16_t uniffi_routex_client_uniffi_checksum_method_routexclient_transfer(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_CONSTRUCTOR_ROUTEXCLIENT_NEW
+#define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_CHECKSUM_CONSTRUCTOR_ROUTEXCLIENT_NEW
+uint16_t uniffi_routex_client_uniffi_checksum_constructor_routexclient_new(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_UNIFFI_CONTRACT_VERSION
+#define UNIFFI_FFIDEF_FFI_ROUTEX_CLIENT_UNIFFI_UNIFFI_CONTRACT_VERSION
+uint32_t ffi_routex_client_uniffi_uniffi_contract_version(void
+    
+);
+#endif
+

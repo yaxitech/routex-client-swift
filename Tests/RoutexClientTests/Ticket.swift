@@ -37,6 +37,20 @@ struct CollectPaymentData: Codable {
     var remittance: String
 }
 
+struct TransactionsRange: Codable {
+    var from: String
+}
+
+struct TransactionsAccount: Codable {
+    var iban: String
+    var currency: String
+}
+
+struct TransactionsData: Codable {
+    var account: TransactionsAccount
+    var range: TransactionsRange
+}
+
 struct ServiceData<T: Codable & Sendable>: Codable {
     var id: String
     var service: String

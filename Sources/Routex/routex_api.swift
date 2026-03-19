@@ -1562,13 +1562,15 @@ public struct PaymentInitiation: Equatable, Hashable {
     public var status: PaymentStatus?
     public var debtorName: String?
     public var debtorIban: String?
+    public var encryptedDebtorIban: Data?
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(status: PaymentStatus? = nil, debtorName: String? = nil, debtorIban: String? = nil) {
+    public init(status: PaymentStatus? = nil, debtorName: String? = nil, debtorIban: String? = nil, encryptedDebtorIban: Data? = nil) {
         self.status = status
         self.debtorName = debtorName
         self.debtorIban = debtorIban
+        self.encryptedDebtorIban = encryptedDebtorIban
     }
 
     
@@ -1589,7 +1591,8 @@ public struct FfiConverterTypePaymentInitiation: FfiConverterRustBuffer {
             try PaymentInitiation(
                 status: FfiConverterOptionTypePaymentStatus.read(from: &buf), 
                 debtorName: FfiConverterOptionString.read(from: &buf), 
-                debtorIban: FfiConverterOptionString.read(from: &buf)
+                debtorIban: FfiConverterOptionString.read(from: &buf), 
+                encryptedDebtorIban: FfiConverterOptionData.read(from: &buf)
         )
     }
 
@@ -1597,6 +1600,7 @@ public struct FfiConverterTypePaymentInitiation: FfiConverterRustBuffer {
         FfiConverterOptionTypePaymentStatus.write(value.status, into: &buf)
         FfiConverterOptionString.write(value.debtorName, into: &buf)
         FfiConverterOptionString.write(value.debtorIban, into: &buf)
+        FfiConverterOptionData.write(value.encryptedDebtorIban, into: &buf)
     }
 }
 
@@ -2510,6 +2514,7 @@ public enum Field: Equatable, Hashable {
     
     case debtorIban
     case debtorName
+    case encryptedDebtorIban
 
 
 
@@ -2535,6 +2540,8 @@ public struct FfiConverterTypeField: FfiConverterRustBuffer {
         
         case 2: return .debtorName
         
+        case 3: return .encryptedDebtorIban
+        
         default: throw UniffiInternalError.unexpectedEnumCase
         }
     }
@@ -2549,6 +2556,10 @@ public struct FfiConverterTypeField: FfiConverterRustBuffer {
         
         case .debtorName:
             writeInt(&buf, Int32(2))
+        
+        
+        case .encryptedDebtorIban:
+            writeInt(&buf, Int32(3))
         
         }
     }
@@ -2911,6 +2922,30 @@ fileprivate struct FfiConverterOptionString: FfiConverterRustBuffer {
         switch try readInt(&buf) as Int8 {
         case 0: return nil
         case 1: return try FfiConverterString.read(from: &buf)
+        default: throw UniffiInternalError.unexpectedOptionalTag
+        }
+    }
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+fileprivate struct FfiConverterOptionData: FfiConverterRustBuffer {
+    typealias SwiftType = Data?
+
+    public static func write(_ value: SwiftType, into buf: inout [UInt8]) {
+        guard let value = value else {
+            writeInt(&buf, Int8(0))
+            return
+        }
+        writeInt(&buf, Int8(1))
+        FfiConverterData.write(value, into: &buf)
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SwiftType {
+        switch try readInt(&buf) as Int8 {
+        case 0: return nil
+        case 1: return try FfiConverterData.read(from: &buf)
         default: throw UniffiInternalError.unexpectedOptionalTag
         }
     }

@@ -96,6 +96,83 @@ extension AccountField {
     #expect(data.data == [Account(iban: demoAccountIban, bic: "BYLADEM1001", currency: "EUR", ownerName: "Dr. Peter Steiger")])
 }
 
+@Test func balances() async throws {
+    let (ticket: ticket, id: ticketId) = try await issueTicket(service: "Balances")
+    var response = try await client.balances(
+        credentials: Credentials(connectionId: demoConnectionId, userId: "confirmation"),
+        session: nil,
+        recurringConsents: nil,
+        ticket: ticket,
+        accounts: [AccountReference(id: .iban(demoAccountIban), currency: "EUR")])
+
+    let context = try await requireDialog(response) { dialog in
+        guard case let .confirmation(context: context, pollingDelaySecs: pollingDelay) = dialog else {
+            throw WrongCase(expected: "Confirmation", actual: dialog)
+        }
+        #expect(pollingDelay == 1)
+        return context
+    }
+
+    response = try await client.confirmBalances(ticket: ticket, context: context)
+    guard case let .result(result: result, session: _, connectionData: _) = response else {
+        throw WrongCase(expected: "Result", actual: response)
+    }
+    let data = result.toData()
+    #expect(UUID(uuidString: data.ticketId)! == ticketId)
+    #expect(data.data == Balances(balances: [
+        AccountBalances(
+            account: AccountReference(id: .iban(demoAccountIban), currency: "EUR"),
+            balances: [
+                Balance(amount: Decimal(string: "8877.78")!, currency: "EUR", balanceType: .booked),
+                Balance(amount: Decimal(string: "8947.64")!, currency: "EUR", balanceType: .available),
+            ])
+    ]))
+}
+
+@Test func transactions() async throws {
+    let (ticket: ticket, id: ticketId) = try await issueTicket(
+        service: "Transactions",
+        TransactionsData(
+            account: TransactionsAccount(iban: demoAccountIban, currency: "EUR"),
+            range: TransactionsRange(from: "2019-01-13")))
+    var response = try await client.transactions(
+        credentials: Credentials(connectionId: demoConnectionId, userId: "confirmation"),
+        session: nil,
+        recurringConsents: nil,
+        ticket: ticket)
+
+    let context = try await requireDialog(response) { dialog in
+        guard case let .confirmation(context: context, pollingDelaySecs: pollingDelay) = dialog else {
+            throw WrongCase(expected: "Confirmation", actual: dialog)
+        }
+        #expect(pollingDelay == 1)
+        return context
+    }
+
+    response = try await client.confirmTransactions(ticket: ticket, context: context)
+    guard case let .result(result: result, session: _, connectionData: _) = response else {
+        throw WrongCase(expected: "Result", actual: response)
+    }
+    let data = result.toData()
+    #expect(UUID(uuidString: data.ticketId)! == ticketId)
+    let transactions = try #require(data.data)
+    #expect(transactions.count == 63)
+
+    let first = transactions[0]
+    #expect(first.amount == Routex.Amount(currency: "EUR", amount: Decimal(string: "-0.95")!))
+    #expect(first.status == .booked)
+    #expect(first.endToEndId == "485209459755938")
+    #expect(first.purposeCode == "DCRD")
+    #expect(first.remittanceInformation == ["VISA Debitkartenumsatz"])
+    #expect(first.creditor == Party(name: "DHL.K53VEV55WWVE/BONN", iban: "DE96120300009005290904"))
+    #expect(first.debtor == Party(name: "ISSUER", iban: "DE02120300000000202051"))
+    #expect(first.bankTransactionCodes == [
+        .iso(domain: "PMNT", family: "ICDT", subFamily: "STDO"),
+        .swift("DDT"),
+        .national(code: "106", country: "DE"),
+    ])
+}
+
 @Test func collectPayment() async throws {
     let (ticket: ticket, id: ticketId) = try await issueTicket(
         service: "CollectPayment",
