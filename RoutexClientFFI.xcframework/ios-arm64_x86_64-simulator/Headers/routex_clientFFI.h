@@ -432,7 +432,7 @@ uint64_t uniffi_routex_client_uniffi_fn_method_routexclient_respond_transfer(uin
 #endif
 #ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_SEARCH
 #define UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_SEARCH
-uint64_t uniffi_routex_client_uniffi_fn_method_routexclient_search(uint64_t ptr, RustBuffer ticket, RustBuffer filters, int8_t iban_detection, RustBuffer limit
+uint64_t uniffi_routex_client_uniffi_fn_method_routexclient_search(uint64_t ptr, RustBuffer ticket, RustBuffer filters, int8_t iban_detection, RustBuffer limit, RustBuffer details
 );
 #endif
 #ifndef UNIFFI_FFIDEF_UNIFFI_ROUTEX_CLIENT_UNIFFI_FN_METHOD_ROUTEXCLIENT_SET_REDIRECT_URI

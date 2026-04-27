@@ -455,6 +455,309 @@ fileprivate struct FfiConverterString: FfiConverter {
     }
 }
 
+// Note that we don't yet support `indirect` for enums.
+// See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
+
+public enum AccountFilter: Equatable, Hashable {
+    
+    case ibanEq(value: String?
+    )
+    case ibanNotEq(value: String?
+    )
+    case numberEq(value: String?
+    )
+    case numberNotEq(value: String?
+    )
+    case bicEq(value: String?
+    )
+    case bicNotEq(value: String?
+    )
+    case bankCodeEq(value: String?
+    )
+    case bankCodeNotEq(value: String?
+    )
+    case currencyEq(value: String
+    )
+    case currencyNotEq(value: String
+    )
+    case nameEq(value: String?
+    )
+    case nameNotEq(value: String?
+    )
+    case displayNameEq(value: String?
+    )
+    case displayNameNotEq(value: String?
+    )
+    case ownerNameEq(value: String?
+    )
+    case ownerNameNotEq(value: String?
+    )
+    case productNameEq(value: String?
+    )
+    case productNameNotEq(value: String?
+    )
+    case statusEq(value: AccountStatus?
+    )
+    case statusNotEq(value: AccountStatus?
+    )
+    case typeEq(value: AccountType?
+    )
+    case typeNotEq(value: AccountType?
+    )
+    case all(filters: [AccountFilter]
+    )
+    case any(filters: [AccountFilter]
+    )
+    case supports(service: SupportedService
+    )
+
+
+
+
+
+}
+
+#if compiler(>=6)
+extension AccountFilter: Sendable {}
+#endif
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public struct FfiConverterTypeAccountFilter: FfiConverterRustBuffer {
+    typealias SwiftType = AccountFilter
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> AccountFilter {
+        let variant: Int32 = try readInt(&buf)
+        switch variant {
+        
+        case 1: return .ibanEq(value: try FfiConverterOptionString.read(from: &buf)
+        )
+        
+        case 2: return .ibanNotEq(value: try FfiConverterOptionString.read(from: &buf)
+        )
+        
+        case 3: return .numberEq(value: try FfiConverterOptionString.read(from: &buf)
+        )
+        
+        case 4: return .numberNotEq(value: try FfiConverterOptionString.read(from: &buf)
+        )
+        
+        case 5: return .bicEq(value: try FfiConverterOptionString.read(from: &buf)
+        )
+        
+        case 6: return .bicNotEq(value: try FfiConverterOptionString.read(from: &buf)
+        )
+        
+        case 7: return .bankCodeEq(value: try FfiConverterOptionString.read(from: &buf)
+        )
+        
+        case 8: return .bankCodeNotEq(value: try FfiConverterOptionString.read(from: &buf)
+        )
+        
+        case 9: return .currencyEq(value: try FfiConverterString.read(from: &buf)
+        )
+        
+        case 10: return .currencyNotEq(value: try FfiConverterString.read(from: &buf)
+        )
+        
+        case 11: return .nameEq(value: try FfiConverterOptionString.read(from: &buf)
+        )
+        
+        case 12: return .nameNotEq(value: try FfiConverterOptionString.read(from: &buf)
+        )
+        
+        case 13: return .displayNameEq(value: try FfiConverterOptionString.read(from: &buf)
+        )
+        
+        case 14: return .displayNameNotEq(value: try FfiConverterOptionString.read(from: &buf)
+        )
+        
+        case 15: return .ownerNameEq(value: try FfiConverterOptionString.read(from: &buf)
+        )
+        
+        case 16: return .ownerNameNotEq(value: try FfiConverterOptionString.read(from: &buf)
+        )
+        
+        case 17: return .productNameEq(value: try FfiConverterOptionString.read(from: &buf)
+        )
+        
+        case 18: return .productNameNotEq(value: try FfiConverterOptionString.read(from: &buf)
+        )
+        
+        case 19: return .statusEq(value: try FfiConverterOptionTypeAccountStatus.read(from: &buf)
+        )
+        
+        case 20: return .statusNotEq(value: try FfiConverterOptionTypeAccountStatus.read(from: &buf)
+        )
+        
+        case 21: return .typeEq(value: try FfiConverterOptionTypeAccountType.read(from: &buf)
+        )
+        
+        case 22: return .typeNotEq(value: try FfiConverterOptionTypeAccountType.read(from: &buf)
+        )
+        
+        case 23: return .all(filters: try FfiConverterSequenceTypeAccountFilter.read(from: &buf)
+        )
+        
+        case 24: return .any(filters: try FfiConverterSequenceTypeAccountFilter.read(from: &buf)
+        )
+        
+        case 25: return .supports(service: try FfiConverterTypeSupportedService.read(from: &buf)
+        )
+        
+        default: throw UniffiInternalError.unexpectedEnumCase
+        }
+    }
+
+    public static func write(_ value: AccountFilter, into buf: inout [UInt8]) {
+        switch value {
+        
+        
+        case let .ibanEq(value):
+            writeInt(&buf, Int32(1))
+            FfiConverterOptionString.write(value, into: &buf)
+            
+        
+        case let .ibanNotEq(value):
+            writeInt(&buf, Int32(2))
+            FfiConverterOptionString.write(value, into: &buf)
+            
+        
+        case let .numberEq(value):
+            writeInt(&buf, Int32(3))
+            FfiConverterOptionString.write(value, into: &buf)
+            
+        
+        case let .numberNotEq(value):
+            writeInt(&buf, Int32(4))
+            FfiConverterOptionString.write(value, into: &buf)
+            
+        
+        case let .bicEq(value):
+            writeInt(&buf, Int32(5))
+            FfiConverterOptionString.write(value, into: &buf)
+            
+        
+        case let .bicNotEq(value):
+            writeInt(&buf, Int32(6))
+            FfiConverterOptionString.write(value, into: &buf)
+            
+        
+        case let .bankCodeEq(value):
+            writeInt(&buf, Int32(7))
+            FfiConverterOptionString.write(value, into: &buf)
+            
+        
+        case let .bankCodeNotEq(value):
+            writeInt(&buf, Int32(8))
+            FfiConverterOptionString.write(value, into: &buf)
+            
+        
+        case let .currencyEq(value):
+            writeInt(&buf, Int32(9))
+            FfiConverterString.write(value, into: &buf)
+            
+        
+        case let .currencyNotEq(value):
+            writeInt(&buf, Int32(10))
+            FfiConverterString.write(value, into: &buf)
+            
+        
+        case let .nameEq(value):
+            writeInt(&buf, Int32(11))
+            FfiConverterOptionString.write(value, into: &buf)
+            
+        
+        case let .nameNotEq(value):
+            writeInt(&buf, Int32(12))
+            FfiConverterOptionString.write(value, into: &buf)
+            
+        
+        case let .displayNameEq(value):
+            writeInt(&buf, Int32(13))
+            FfiConverterOptionString.write(value, into: &buf)
+            
+        
+        case let .displayNameNotEq(value):
+            writeInt(&buf, Int32(14))
+            FfiConverterOptionString.write(value, into: &buf)
+            
+        
+        case let .ownerNameEq(value):
+            writeInt(&buf, Int32(15))
+            FfiConverterOptionString.write(value, into: &buf)
+            
+        
+        case let .ownerNameNotEq(value):
+            writeInt(&buf, Int32(16))
+            FfiConverterOptionString.write(value, into: &buf)
+            
+        
+        case let .productNameEq(value):
+            writeInt(&buf, Int32(17))
+            FfiConverterOptionString.write(value, into: &buf)
+            
+        
+        case let .productNameNotEq(value):
+            writeInt(&buf, Int32(18))
+            FfiConverterOptionString.write(value, into: &buf)
+            
+        
+        case let .statusEq(value):
+            writeInt(&buf, Int32(19))
+            FfiConverterOptionTypeAccountStatus.write(value, into: &buf)
+            
+        
+        case let .statusNotEq(value):
+            writeInt(&buf, Int32(20))
+            FfiConverterOptionTypeAccountStatus.write(value, into: &buf)
+            
+        
+        case let .typeEq(value):
+            writeInt(&buf, Int32(21))
+            FfiConverterOptionTypeAccountType.write(value, into: &buf)
+            
+        
+        case let .typeNotEq(value):
+            writeInt(&buf, Int32(22))
+            FfiConverterOptionTypeAccountType.write(value, into: &buf)
+            
+        
+        case let .all(filters):
+            writeInt(&buf, Int32(23))
+            FfiConverterSequenceTypeAccountFilter.write(filters, into: &buf)
+            
+        
+        case let .any(filters):
+            writeInt(&buf, Int32(24))
+            FfiConverterSequenceTypeAccountFilter.write(filters, into: &buf)
+            
+        
+        case let .supports(service):
+            writeInt(&buf, Int32(25))
+            FfiConverterTypeSupportedService.write(service, into: &buf)
+            
+        }
+    }
+}
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeAccountFilter_lift(_ buf: RustBuffer) throws -> AccountFilter {
+    return try FfiConverterTypeAccountFilter.lift(buf)
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeAccountFilter_lower(_ value: AccountFilter) -> RustBuffer {
+    return FfiConverterTypeAccountFilter.lower(value)
+}
+
+
 
 public enum RoutexClientError: Swift.Error, Equatable, Hashable, Foundation.LocalizedError {
 
@@ -693,6 +996,142 @@ public func FfiConverterTypeRoutexClientError_lower(_ value: RoutexClientError) 
     return FfiConverterTypeRoutexClientError.lower(value)
 }
 
+// Note that we don't yet support `indirect` for enums.
+// See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
+/**
+ * Filters for the connection lookup
+ *
+ * String filters look for the given value anywhere in the related field, case-insensitive.
+ */
+
+public enum SearchFilter: Equatable, Hashable {
+    
+    /**
+     * List of `ConnectionType`s to consider.
+     */
+    case types(types: [ConnectionType]
+    )
+    /**
+     * List of `CountryCode`s to consider.
+     */
+    case countries(countries: [CountryCode]
+    )
+    /**
+     * String filter for the provider / product name or any alias.
+     */
+    case name(name: String
+    )
+    /**
+     * String filter for the BIC.
+     */
+    case bic(bic: String
+    )
+    /**
+     * String filter for the (national) bank code.
+     */
+    case bankCode(bankCode: String
+    )
+    /**
+     * String filter for any of those fields.
+     */
+    case term(term: String
+    )
+
+
+
+
+
+}
+
+#if compiler(>=6)
+extension SearchFilter: Sendable {}
+#endif
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public struct FfiConverterTypeSearchFilter: FfiConverterRustBuffer {
+    typealias SwiftType = SearchFilter
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SearchFilter {
+        let variant: Int32 = try readInt(&buf)
+        switch variant {
+        
+        case 1: return .types(types: try FfiConverterSequenceTypeConnectionType.read(from: &buf)
+        )
+        
+        case 2: return .countries(countries: try FfiConverterSequenceTypeCountryCode.read(from: &buf)
+        )
+        
+        case 3: return .name(name: try FfiConverterString.read(from: &buf)
+        )
+        
+        case 4: return .bic(bic: try FfiConverterString.read(from: &buf)
+        )
+        
+        case 5: return .bankCode(bankCode: try FfiConverterString.read(from: &buf)
+        )
+        
+        case 6: return .term(term: try FfiConverterString.read(from: &buf)
+        )
+        
+        default: throw UniffiInternalError.unexpectedEnumCase
+        }
+    }
+
+    public static func write(_ value: SearchFilter, into buf: inout [UInt8]) {
+        switch value {
+        
+        
+        case let .types(types):
+            writeInt(&buf, Int32(1))
+            FfiConverterSequenceTypeConnectionType.write(types, into: &buf)
+            
+        
+        case let .countries(countries):
+            writeInt(&buf, Int32(2))
+            FfiConverterSequenceTypeCountryCode.write(countries, into: &buf)
+            
+        
+        case let .name(name):
+            writeInt(&buf, Int32(3))
+            FfiConverterString.write(name, into: &buf)
+            
+        
+        case let .bic(bic):
+            writeInt(&buf, Int32(4))
+            FfiConverterString.write(bic, into: &buf)
+            
+        
+        case let .bankCode(bankCode):
+            writeInt(&buf, Int32(5))
+            FfiConverterString.write(bankCode, into: &buf)
+            
+        
+        case let .term(term):
+            writeInt(&buf, Int32(6))
+            FfiConverterString.write(term, into: &buf)
+            
+        }
+    }
+}
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeSearchFilter_lift(_ buf: RustBuffer) throws -> SearchFilter {
+    return try FfiConverterTypeSearchFilter.lift(buf)
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeSearchFilter_lower(_ value: SearchFilter) -> RustBuffer {
+    return FfiConverterTypeSearchFilter.lower(value)
+}
+
+
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
@@ -712,6 +1151,54 @@ fileprivate struct FfiConverterOptionString: FfiConverterRustBuffer {
         switch try readInt(&buf) as Int8 {
         case 0: return nil
         case 1: return try FfiConverterString.read(from: &buf)
+        default: throw UniffiInternalError.unexpectedOptionalTag
+        }
+    }
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+fileprivate struct FfiConverterOptionTypeAccountStatus: FfiConverterRustBuffer {
+    typealias SwiftType = AccountStatus?
+
+    public static func write(_ value: SwiftType, into buf: inout [UInt8]) {
+        guard let value = value else {
+            writeInt(&buf, Int8(0))
+            return
+        }
+        writeInt(&buf, Int8(1))
+        FfiConverterTypeAccountStatus.write(value, into: &buf)
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SwiftType {
+        switch try readInt(&buf) as Int8 {
+        case 0: return nil
+        case 1: return try FfiConverterTypeAccountStatus.read(from: &buf)
+        default: throw UniffiInternalError.unexpectedOptionalTag
+        }
+    }
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+fileprivate struct FfiConverterOptionTypeAccountType: FfiConverterRustBuffer {
+    typealias SwiftType = AccountType?
+
+    public static func write(_ value: SwiftType, into buf: inout [UInt8]) {
+        guard let value = value else {
+            writeInt(&buf, Int8(0))
+            return
+        }
+        writeInt(&buf, Int8(1))
+        FfiConverterTypeAccountType.write(value, into: &buf)
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SwiftType {
+        switch try readInt(&buf) as Int8 {
+        case 0: return nil
+        case 1: return try FfiConverterTypeAccountType.read(from: &buf)
         default: throw UniffiInternalError.unexpectedOptionalTag
         }
     }
@@ -810,6 +1297,81 @@ fileprivate struct FfiConverterOptionTypeUnsupportedProductReason: FfiConverterR
         case 1: return try FfiConverterTypeUnsupportedProductReason.read(from: &buf)
         default: throw UniffiInternalError.unexpectedOptionalTag
         }
+    }
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+fileprivate struct FfiConverterSequenceTypeConnectionType: FfiConverterRustBuffer {
+    typealias SwiftType = [ConnectionType]
+
+    public static func write(_ value: [ConnectionType], into buf: inout [UInt8]) {
+        let len = Int32(value.count)
+        writeInt(&buf, len)
+        for item in value {
+            FfiConverterTypeConnectionType.write(item, into: &buf)
+        }
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> [ConnectionType] {
+        let len: Int32 = try readInt(&buf)
+        var seq = [ConnectionType]()
+        seq.reserveCapacity(Int(len))
+        for _ in 0 ..< len {
+            seq.append(try FfiConverterTypeConnectionType.read(from: &buf))
+        }
+        return seq
+    }
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+fileprivate struct FfiConverterSequenceTypeAccountFilter: FfiConverterRustBuffer {
+    typealias SwiftType = [AccountFilter]
+
+    public static func write(_ value: [AccountFilter], into buf: inout [UInt8]) {
+        let len = Int32(value.count)
+        writeInt(&buf, len)
+        for item in value {
+            FfiConverterTypeAccountFilter.write(item, into: &buf)
+        }
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> [AccountFilter] {
+        let len: Int32 = try readInt(&buf)
+        var seq = [AccountFilter]()
+        seq.reserveCapacity(Int(len))
+        for _ in 0 ..< len {
+            seq.append(try FfiConverterTypeAccountFilter.read(from: &buf))
+        }
+        return seq
+    }
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+fileprivate struct FfiConverterSequenceTypeCountryCode: FfiConverterRustBuffer {
+    typealias SwiftType = [CountryCode]
+
+    public static func write(_ value: [CountryCode], into buf: inout [UInt8]) {
+        let len = Int32(value.count)
+        writeInt(&buf, len)
+        for item in value {
+            FfiConverterTypeCountryCode.write(item, into: &buf)
+        }
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> [CountryCode] {
+        let len: Int32 = try readInt(&buf)
+        var seq = [CountryCode]()
+        seq.reserveCapacity(Int(len))
+        for _ in 0 ..< len {
+            seq.append(try FfiConverterTypeCountryCode.read(from: &buf))
+        }
+        return seq
     }
 }
 

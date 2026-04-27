@@ -46,7 +46,8 @@ extension AccountField {
                                    credentials: CredentialsModel(full: true, userId: false, none: false),
                                    userId: "NetKey / Alias",
                                    password: "PIN",
-                                   logoId: "gls"))
+                                   logoId: "gls",
+                                   bics: ["GENODEM1GLS"]))
 }
 
 @Test func accountsWithRedirect() async throws {
@@ -123,8 +124,16 @@ extension AccountField {
         AccountBalances(
             account: AccountReference(id: .iban(demoAccountIban), currency: "EUR"),
             balances: [
-                Balance(amount: Decimal(string: "8877.78")!, currency: "EUR", balanceType: .booked),
-                Balance(amount: Decimal(string: "8947.64")!, currency: "EUR", balanceType: .available),
+                Balance(
+                    amount: Decimal(string: "8877.78")!,
+                    currency: "EUR",
+                    balanceType: .booked,
+                    creditLimitIncluded: false),
+                Balance(
+                    amount: Decimal(string: "8947.64")!,
+                    currency: "EUR",
+                    balanceType: .available,
+                    creditLimitIncluded: false),
             ])
     ]))
 }

@@ -1185,50 +1185,137 @@ public func FfiConverterTypeAuthenticatedTransferResult_lower(_ value: Authentic
 
 public protocol RoutexClientProtocol: AnyObject, Sendable {
     
+    /**
+     * [Accounts service](https://docs.yaxi.tech/accounts.html)
+     */
     func accounts(credentials: Credentials, session: Session?, recurringConsents: Bool?, ticket: Ticket, fields: [AccountField], filter: AccountFilter?) async throws  -> AccountsResponse
     
+    /**
+     * [Balances service](https://docs.yaxi.tech/balances.html)
+     */
     func balances(credentials: Credentials, session: Session?, recurringConsents: Bool?, ticket: Ticket, accounts: [AccountReference]) async throws  -> BalancesResponse
     
+    /**
+     * [Collect Payment service](https://docs.yaxi.tech/collect-payment.html)
+     */
     func collectPayment(credentials: Credentials, session: Session?, recurringConsents: Bool?, ticket: Ticket, account: AccountReference?) async throws  -> CollectPaymentResponse
     
+    /**
+     * Confirm dialog or redirect returned from Accounts service
+     */
     func confirmAccounts(ticket: Ticket, context: ConfirmationContext) async throws  -> AccountsResponse
     
+    /**
+     * Confirm dialog or redirect returned from Balances service
+     */
     func confirmBalances(ticket: Ticket, context: ConfirmationContext) async throws  -> BalancesResponse
     
+    /**
+     * Confirm dialog or redirect returned from CollectPayment service
+     */
     func confirmCollectPayment(ticket: Ticket, context: ConfirmationContext) async throws  -> CollectPaymentResponse
     
+    /**
+     * Confirm dialog or redirect returned from Transactions service
+     */
     func confirmTransactions(ticket: Ticket, context: ConfirmationContext) async throws  -> TransactionsResponse
     
+    /**
+     * Confirm dialog or redirect returned from Transfer service
+     */
     func confirmTransfer(ticket: Ticket, context: ConfirmationContext) async throws  -> TransferResponse
     
+    /**
+     * Get information for a service connection
+     */
     func info(ticket: Ticket, connectionId: ConnectionId) async throws  -> ConnectionInfo
     
+    /**
+     * Register a redirect URI for a given redirect handle.
+     *
+     * Returns the URL that the user is meant to get sent to.
+     */
     func registerRedirectUri(ticket: Ticket, handle: String, redirectUri: String) async throws  -> Url
     
+    /**
+     * Respond to dialog returned from Accounts service
+     */
     func respondAccounts(ticket: Ticket, context: InputContext, response: String) async throws  -> AccountsResponse
     
+    /**
+     * Respond to dialog returned from Balances service
+     */
     func respondBalances(ticket: Ticket, context: InputContext, response: String) async throws  -> BalancesResponse
     
+    /**
+     * Respond to dialog returned from CollectPayment service
+     */
     func respondCollectPayment(ticket: Ticket, context: InputContext, response: String) async throws  -> CollectPaymentResponse
     
+    /**
+     * Respond to dialog returned from Transactions service
+     */
     func respondTransactions(ticket: Ticket, context: InputContext, response: String) async throws  -> TransactionsResponse
     
+    /**
+     * Respond to dialog returned from Transfer service
+     */
     func respondTransfer(ticket: Ticket, context: InputContext, response: String) async throws  -> TransferResponse
     
-    func search(ticket: Ticket, filters: [SearchFilter], ibanDetection: Bool, limit: UInt32?) async throws  -> [ConnectionInfo]
+    /**
+     * Search for service connections (banks and other providers)
+     *
+     * The result is a list of connections that match all the `SearchFilter`s.
+     * If IBAN detection is enabled and the first value of a `Term` is detected
+     * to be a possible prefix of an IBAN that contains a national bank code,
+     * the result might contain additional connections that match that bank code.
+     */
+    func search(ticket: Ticket, filters: [SearchFilter], ibanDetection: Bool, limit: UInt32?, details: [Details]) async throws  -> [ConnectionInfo]
     
+    /**
+     * Set a redirect URI for subsequent service requests.
+     *
+     * Redirects will eventually forward to that URI.
+     * It can be used to redirect back to a web application or to jump
+     * back into the context of a desktop or mobile application.
+     *
+     * If no redirect URI is set, `RedirectHandle`s will get returned instead of `Redirect`s.
+     */
     func setRedirectUri(redirectUri: String) throws 
     
+    /**
+     * Run a key settlement with the routex service, verifying the attestation report.
+     *
+     * Stores a new random secret key and announces its public key to routex.
+     * In return, routex responds with its own public key and an attestation report.
+     * The attestation report allows verifying that routex created its corresponding secret key within the TEE
+     * and that its creation happened in response to our client public key (freshness).
+     */
     func settleKey(ticket: Ticket) async throws 
     
+    /**
+     * System version for the currently established session
+     */
     func systemVersion(ticketId: String) async throws  -> String?
     
+    /**
+     * Retrieve trace data
+     */
     func trace(ticket: Ticket, traceId: Data) async throws  -> String
     
+    /**
+     * Trace identifier returned with the last request
+     */
     func traceId()  -> Data?
     
+    /**
+     * [Transactions service](https://docs.yaxi.tech/transactions.html)
+     */
     func transactions(credentials: Credentials, session: Session?, recurringConsents: Bool?, ticket: Ticket) async throws  -> TransactionsResponse
     
+    /**
+     * [Transfer service](https://docs.yaxi.tech/transfer.html)
+     */
     func transfer(credentials: Credentials, session: Session?, recurringConsents: Bool?, ticket: Ticket, product: PaymentProduct, details: [TransferDetails], debtorAccount: AccountReference?, debtorName: String?, requestedExecutionDate: DateTime?) async throws  -> TransferResponse
     
 }
@@ -1271,6 +1358,9 @@ open class RoutexClient: RoutexClientProtocol, @unchecked Sendable {
     public func uniffiCloneHandle() -> UInt64 {
         return try! rustCall { uniffi_routex_client_uniffi_fn_clone_routexclient(self.handle, $0) }
     }
+    /**
+     * Create a new client
+     */
 public convenience init(distribution: String, version: String, url: Url) {
     let handle =
         try! rustCall() {
@@ -1295,6 +1385,9 @@ public convenience init(distribution: String, version: String, url: Url) {
     
 
     
+    /**
+     * [Accounts service](https://docs.yaxi.tech/accounts.html)
+     */
 open func accounts(credentials: Credentials, session: Session?, recurringConsents: Bool?, ticket: Ticket, fields: [AccountField], filter: AccountFilter? = nil)async throws  -> AccountsResponse  {
     return
         try  await uniffiRustCallAsync(
@@ -1312,6 +1405,9 @@ open func accounts(credentials: Credentials, session: Session?, recurringConsent
         )
 }
     
+    /**
+     * [Balances service](https://docs.yaxi.tech/balances.html)
+     */
 open func balances(credentials: Credentials, session: Session?, recurringConsents: Bool?, ticket: Ticket, accounts: [AccountReference])async throws  -> BalancesResponse  {
     return
         try  await uniffiRustCallAsync(
@@ -1329,6 +1425,9 @@ open func balances(credentials: Credentials, session: Session?, recurringConsent
         )
 }
     
+    /**
+     * [Collect Payment service](https://docs.yaxi.tech/collect-payment.html)
+     */
 open func collectPayment(credentials: Credentials, session: Session?, recurringConsents: Bool?, ticket: Ticket, account: AccountReference? = nil)async throws  -> CollectPaymentResponse  {
     return
         try  await uniffiRustCallAsync(
@@ -1346,6 +1445,9 @@ open func collectPayment(credentials: Credentials, session: Session?, recurringC
         )
 }
     
+    /**
+     * Confirm dialog or redirect returned from Accounts service
+     */
 open func confirmAccounts(ticket: Ticket, context: ConfirmationContext)async throws  -> AccountsResponse  {
     return
         try  await uniffiRustCallAsync(
@@ -1363,6 +1465,9 @@ open func confirmAccounts(ticket: Ticket, context: ConfirmationContext)async thr
         )
 }
     
+    /**
+     * Confirm dialog or redirect returned from Balances service
+     */
 open func confirmBalances(ticket: Ticket, context: ConfirmationContext)async throws  -> BalancesResponse  {
     return
         try  await uniffiRustCallAsync(
@@ -1380,6 +1485,9 @@ open func confirmBalances(ticket: Ticket, context: ConfirmationContext)async thr
         )
 }
     
+    /**
+     * Confirm dialog or redirect returned from CollectPayment service
+     */
 open func confirmCollectPayment(ticket: Ticket, context: ConfirmationContext)async throws  -> CollectPaymentResponse  {
     return
         try  await uniffiRustCallAsync(
@@ -1397,6 +1505,9 @@ open func confirmCollectPayment(ticket: Ticket, context: ConfirmationContext)asy
         )
 }
     
+    /**
+     * Confirm dialog or redirect returned from Transactions service
+     */
 open func confirmTransactions(ticket: Ticket, context: ConfirmationContext)async throws  -> TransactionsResponse  {
     return
         try  await uniffiRustCallAsync(
@@ -1414,6 +1525,9 @@ open func confirmTransactions(ticket: Ticket, context: ConfirmationContext)async
         )
 }
     
+    /**
+     * Confirm dialog or redirect returned from Transfer service
+     */
 open func confirmTransfer(ticket: Ticket, context: ConfirmationContext)async throws  -> TransferResponse  {
     return
         try  await uniffiRustCallAsync(
@@ -1431,6 +1545,9 @@ open func confirmTransfer(ticket: Ticket, context: ConfirmationContext)async thr
         )
 }
     
+    /**
+     * Get information for a service connection
+     */
 open func info(ticket: Ticket, connectionId: ConnectionId)async throws  -> ConnectionInfo  {
     return
         try  await uniffiRustCallAsync(
@@ -1448,6 +1565,11 @@ open func info(ticket: Ticket, connectionId: ConnectionId)async throws  -> Conne
         )
 }
     
+    /**
+     * Register a redirect URI for a given redirect handle.
+     *
+     * Returns the URL that the user is meant to get sent to.
+     */
 open func registerRedirectUri(ticket: Ticket, handle: String, redirectUri: String)async throws  -> Url  {
     return
         try  await uniffiRustCallAsync(
@@ -1465,6 +1587,9 @@ open func registerRedirectUri(ticket: Ticket, handle: String, redirectUri: Strin
         )
 }
     
+    /**
+     * Respond to dialog returned from Accounts service
+     */
 open func respondAccounts(ticket: Ticket, context: InputContext, response: String)async throws  -> AccountsResponse  {
     return
         try  await uniffiRustCallAsync(
@@ -1482,6 +1607,9 @@ open func respondAccounts(ticket: Ticket, context: InputContext, response: Strin
         )
 }
     
+    /**
+     * Respond to dialog returned from Balances service
+     */
 open func respondBalances(ticket: Ticket, context: InputContext, response: String)async throws  -> BalancesResponse  {
     return
         try  await uniffiRustCallAsync(
@@ -1499,6 +1627,9 @@ open func respondBalances(ticket: Ticket, context: InputContext, response: Strin
         )
 }
     
+    /**
+     * Respond to dialog returned from CollectPayment service
+     */
 open func respondCollectPayment(ticket: Ticket, context: InputContext, response: String)async throws  -> CollectPaymentResponse  {
     return
         try  await uniffiRustCallAsync(
@@ -1516,6 +1647,9 @@ open func respondCollectPayment(ticket: Ticket, context: InputContext, response:
         )
 }
     
+    /**
+     * Respond to dialog returned from Transactions service
+     */
 open func respondTransactions(ticket: Ticket, context: InputContext, response: String)async throws  -> TransactionsResponse  {
     return
         try  await uniffiRustCallAsync(
@@ -1533,6 +1667,9 @@ open func respondTransactions(ticket: Ticket, context: InputContext, response: S
         )
 }
     
+    /**
+     * Respond to dialog returned from Transfer service
+     */
 open func respondTransfer(ticket: Ticket, context: InputContext, response: String)async throws  -> TransferResponse  {
     return
         try  await uniffiRustCallAsync(
@@ -1550,13 +1687,21 @@ open func respondTransfer(ticket: Ticket, context: InputContext, response: Strin
         )
 }
     
-open func search(ticket: Ticket, filters: [SearchFilter], ibanDetection: Bool, limit: UInt32? = nil)async throws  -> [ConnectionInfo]  {
+    /**
+     * Search for service connections (banks and other providers)
+     *
+     * The result is a list of connections that match all the `SearchFilter`s.
+     * If IBAN detection is enabled and the first value of a `Term` is detected
+     * to be a possible prefix of an IBAN that contains a national bank code,
+     * the result might contain additional connections that match that bank code.
+     */
+open func search(ticket: Ticket, filters: [SearchFilter], ibanDetection: Bool = false, limit: UInt32? = nil, details: [Details] = [])async throws  -> [ConnectionInfo]  {
     return
         try  await uniffiRustCallAsync(
             rustFutureFunc: {
                 uniffi_routex_client_uniffi_fn_method_routexclient_search(
                     self.uniffiCloneHandle(),
-                    FfiConverterTypeTicket_lower(ticket),FfiConverterSequenceTypeSearchFilter.lower(filters),FfiConverterBool.lower(ibanDetection),FfiConverterOptionUInt32.lower(limit)
+                    FfiConverterTypeTicket_lower(ticket),FfiConverterSequenceTypeSearchFilter.lower(filters),FfiConverterBool.lower(ibanDetection),FfiConverterOptionUInt32.lower(limit),FfiConverterSequenceTypeDetails.lower(details)
                 )
             },
             pollFunc: ffi_routex_client_uniffi_rust_future_poll_rust_buffer,
@@ -1567,6 +1712,15 @@ open func search(ticket: Ticket, filters: [SearchFilter], ibanDetection: Bool, l
         )
 }
     
+    /**
+     * Set a redirect URI for subsequent service requests.
+     *
+     * Redirects will eventually forward to that URI.
+     * It can be used to redirect back to a web application or to jump
+     * back into the context of a desktop or mobile application.
+     *
+     * If no redirect URI is set, `RedirectHandle`s will get returned instead of `Redirect`s.
+     */
 open func setRedirectUri(redirectUri: String)throws   {try rustCallWithError(FfiConverterTypeRoutexClientError_lift) {
     uniffi_routex_client_uniffi_fn_method_routexclient_set_redirect_uri(
             self.uniffiCloneHandle(),
@@ -1575,6 +1729,14 @@ open func setRedirectUri(redirectUri: String)throws   {try rustCallWithError(Ffi
 }
 }
     
+    /**
+     * Run a key settlement with the routex service, verifying the attestation report.
+     *
+     * Stores a new random secret key and announces its public key to routex.
+     * In return, routex responds with its own public key and an attestation report.
+     * The attestation report allows verifying that routex created its corresponding secret key within the TEE
+     * and that its creation happened in response to our client public key (freshness).
+     */
 open func settleKey(ticket: Ticket)async throws   {
     return
         try  await uniffiRustCallAsync(
@@ -1592,6 +1754,9 @@ open func settleKey(ticket: Ticket)async throws   {
         )
 }
     
+    /**
+     * System version for the currently established session
+     */
 open func systemVersion(ticketId: String)async throws  -> String?  {
     return
         try  await uniffiRustCallAsync(
@@ -1609,6 +1774,9 @@ open func systemVersion(ticketId: String)async throws  -> String?  {
         )
 }
     
+    /**
+     * Retrieve trace data
+     */
 open func trace(ticket: Ticket, traceId: Data)async throws  -> String  {
     return
         try  await uniffiRustCallAsync(
@@ -1626,6 +1794,9 @@ open func trace(ticket: Ticket, traceId: Data)async throws  -> String  {
         )
 }
     
+    /**
+     * Trace identifier returned with the last request
+     */
 open func traceId() -> Data?  {
     return try!  FfiConverterOptionData.lift(try! rustCall() {
     uniffi_routex_client_uniffi_fn_method_routexclient_trace_id(
@@ -1634,6 +1805,9 @@ open func traceId() -> Data?  {
 })
 }
     
+    /**
+     * [Transactions service](https://docs.yaxi.tech/transactions.html)
+     */
 open func transactions(credentials: Credentials, session: Session?, recurringConsents: Bool?, ticket: Ticket)async throws  -> TransactionsResponse  {
     return
         try  await uniffiRustCallAsync(
@@ -1651,6 +1825,9 @@ open func transactions(credentials: Credentials, session: Session?, recurringCon
         )
 }
     
+    /**
+     * [Transfer service](https://docs.yaxi.tech/transfer.html)
+     */
 open func transfer(credentials: Credentials, session: Session?, recurringConsents: Bool?, ticket: Ticket, product: PaymentProduct, details: [TransferDetails], debtorAccount: AccountReference? = nil, debtorName: String? = nil, requestedExecutionDate: DateTime? = nil)async throws  -> TransferResponse  {
     return
         try  await uniffiRustCallAsync(
@@ -2004,309 +2181,6 @@ public func FfiConverterTypeTransferResult_lift(_ buf: RustBuffer) throws -> Tra
 public func FfiConverterTypeTransferResult_lower(_ value: TransferResult) -> RustBuffer {
     return FfiConverterTypeTransferResult.lower(value)
 }
-
-// Note that we don't yet support `indirect` for enums.
-// See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
-
-public enum AccountFilter: Equatable, Hashable {
-    
-    case ibanEq(value: String?
-    )
-    case ibanNotEq(value: String?
-    )
-    case numberEq(value: String?
-    )
-    case numberNotEq(value: String?
-    )
-    case bicEq(value: String?
-    )
-    case bicNotEq(value: String?
-    )
-    case bankCodeEq(value: String?
-    )
-    case bankCodeNotEq(value: String?
-    )
-    case currencyEq(value: String
-    )
-    case currencyNotEq(value: String
-    )
-    case nameEq(value: String?
-    )
-    case nameNotEq(value: String?
-    )
-    case displayNameEq(value: String?
-    )
-    case displayNameNotEq(value: String?
-    )
-    case ownerNameEq(value: String?
-    )
-    case ownerNameNotEq(value: String?
-    )
-    case productNameEq(value: String?
-    )
-    case productNameNotEq(value: String?
-    )
-    case statusEq(value: AccountStatus?
-    )
-    case statusNotEq(value: AccountStatus?
-    )
-    case typeEq(value: AccountType?
-    )
-    case typeNotEq(value: AccountType?
-    )
-    case all(filters: [AccountFilter]
-    )
-    case any(filters: [AccountFilter]
-    )
-    case supports(service: SupportedService
-    )
-
-
-
-
-
-}
-
-#if compiler(>=6)
-extension AccountFilter: Sendable {}
-#endif
-
-#if swift(>=5.8)
-@_documentation(visibility: private)
-#endif
-public struct FfiConverterTypeAccountFilter: FfiConverterRustBuffer {
-    typealias SwiftType = AccountFilter
-
-    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> AccountFilter {
-        let variant: Int32 = try readInt(&buf)
-        switch variant {
-        
-        case 1: return .ibanEq(value: try FfiConverterOptionString.read(from: &buf)
-        )
-        
-        case 2: return .ibanNotEq(value: try FfiConverterOptionString.read(from: &buf)
-        )
-        
-        case 3: return .numberEq(value: try FfiConverterOptionString.read(from: &buf)
-        )
-        
-        case 4: return .numberNotEq(value: try FfiConverterOptionString.read(from: &buf)
-        )
-        
-        case 5: return .bicEq(value: try FfiConverterOptionString.read(from: &buf)
-        )
-        
-        case 6: return .bicNotEq(value: try FfiConverterOptionString.read(from: &buf)
-        )
-        
-        case 7: return .bankCodeEq(value: try FfiConverterOptionString.read(from: &buf)
-        )
-        
-        case 8: return .bankCodeNotEq(value: try FfiConverterOptionString.read(from: &buf)
-        )
-        
-        case 9: return .currencyEq(value: try FfiConverterString.read(from: &buf)
-        )
-        
-        case 10: return .currencyNotEq(value: try FfiConverterString.read(from: &buf)
-        )
-        
-        case 11: return .nameEq(value: try FfiConverterOptionString.read(from: &buf)
-        )
-        
-        case 12: return .nameNotEq(value: try FfiConverterOptionString.read(from: &buf)
-        )
-        
-        case 13: return .displayNameEq(value: try FfiConverterOptionString.read(from: &buf)
-        )
-        
-        case 14: return .displayNameNotEq(value: try FfiConverterOptionString.read(from: &buf)
-        )
-        
-        case 15: return .ownerNameEq(value: try FfiConverterOptionString.read(from: &buf)
-        )
-        
-        case 16: return .ownerNameNotEq(value: try FfiConverterOptionString.read(from: &buf)
-        )
-        
-        case 17: return .productNameEq(value: try FfiConverterOptionString.read(from: &buf)
-        )
-        
-        case 18: return .productNameNotEq(value: try FfiConverterOptionString.read(from: &buf)
-        )
-        
-        case 19: return .statusEq(value: try FfiConverterOptionTypeAccountStatus.read(from: &buf)
-        )
-        
-        case 20: return .statusNotEq(value: try FfiConverterOptionTypeAccountStatus.read(from: &buf)
-        )
-        
-        case 21: return .typeEq(value: try FfiConverterOptionTypeAccountType.read(from: &buf)
-        )
-        
-        case 22: return .typeNotEq(value: try FfiConverterOptionTypeAccountType.read(from: &buf)
-        )
-        
-        case 23: return .all(filters: try FfiConverterSequenceTypeAccountFilter.read(from: &buf)
-        )
-        
-        case 24: return .any(filters: try FfiConverterSequenceTypeAccountFilter.read(from: &buf)
-        )
-        
-        case 25: return .supports(service: try FfiConverterTypeSupportedService.read(from: &buf)
-        )
-        
-        default: throw UniffiInternalError.unexpectedEnumCase
-        }
-    }
-
-    public static func write(_ value: AccountFilter, into buf: inout [UInt8]) {
-        switch value {
-        
-        
-        case let .ibanEq(value):
-            writeInt(&buf, Int32(1))
-            FfiConverterOptionString.write(value, into: &buf)
-            
-        
-        case let .ibanNotEq(value):
-            writeInt(&buf, Int32(2))
-            FfiConverterOptionString.write(value, into: &buf)
-            
-        
-        case let .numberEq(value):
-            writeInt(&buf, Int32(3))
-            FfiConverterOptionString.write(value, into: &buf)
-            
-        
-        case let .numberNotEq(value):
-            writeInt(&buf, Int32(4))
-            FfiConverterOptionString.write(value, into: &buf)
-            
-        
-        case let .bicEq(value):
-            writeInt(&buf, Int32(5))
-            FfiConverterOptionString.write(value, into: &buf)
-            
-        
-        case let .bicNotEq(value):
-            writeInt(&buf, Int32(6))
-            FfiConverterOptionString.write(value, into: &buf)
-            
-        
-        case let .bankCodeEq(value):
-            writeInt(&buf, Int32(7))
-            FfiConverterOptionString.write(value, into: &buf)
-            
-        
-        case let .bankCodeNotEq(value):
-            writeInt(&buf, Int32(8))
-            FfiConverterOptionString.write(value, into: &buf)
-            
-        
-        case let .currencyEq(value):
-            writeInt(&buf, Int32(9))
-            FfiConverterString.write(value, into: &buf)
-            
-        
-        case let .currencyNotEq(value):
-            writeInt(&buf, Int32(10))
-            FfiConverterString.write(value, into: &buf)
-            
-        
-        case let .nameEq(value):
-            writeInt(&buf, Int32(11))
-            FfiConverterOptionString.write(value, into: &buf)
-            
-        
-        case let .nameNotEq(value):
-            writeInt(&buf, Int32(12))
-            FfiConverterOptionString.write(value, into: &buf)
-            
-        
-        case let .displayNameEq(value):
-            writeInt(&buf, Int32(13))
-            FfiConverterOptionString.write(value, into: &buf)
-            
-        
-        case let .displayNameNotEq(value):
-            writeInt(&buf, Int32(14))
-            FfiConverterOptionString.write(value, into: &buf)
-            
-        
-        case let .ownerNameEq(value):
-            writeInt(&buf, Int32(15))
-            FfiConverterOptionString.write(value, into: &buf)
-            
-        
-        case let .ownerNameNotEq(value):
-            writeInt(&buf, Int32(16))
-            FfiConverterOptionString.write(value, into: &buf)
-            
-        
-        case let .productNameEq(value):
-            writeInt(&buf, Int32(17))
-            FfiConverterOptionString.write(value, into: &buf)
-            
-        
-        case let .productNameNotEq(value):
-            writeInt(&buf, Int32(18))
-            FfiConverterOptionString.write(value, into: &buf)
-            
-        
-        case let .statusEq(value):
-            writeInt(&buf, Int32(19))
-            FfiConverterOptionTypeAccountStatus.write(value, into: &buf)
-            
-        
-        case let .statusNotEq(value):
-            writeInt(&buf, Int32(20))
-            FfiConverterOptionTypeAccountStatus.write(value, into: &buf)
-            
-        
-        case let .typeEq(value):
-            writeInt(&buf, Int32(21))
-            FfiConverterOptionTypeAccountType.write(value, into: &buf)
-            
-        
-        case let .typeNotEq(value):
-            writeInt(&buf, Int32(22))
-            FfiConverterOptionTypeAccountType.write(value, into: &buf)
-            
-        
-        case let .all(filters):
-            writeInt(&buf, Int32(23))
-            FfiConverterSequenceTypeAccountFilter.write(filters, into: &buf)
-            
-        
-        case let .any(filters):
-            writeInt(&buf, Int32(24))
-            FfiConverterSequenceTypeAccountFilter.write(filters, into: &buf)
-            
-        
-        case let .supports(service):
-            writeInt(&buf, Int32(25))
-            FfiConverterTypeSupportedService.write(service, into: &buf)
-            
-        }
-    }
-}
-
-
-#if swift(>=5.8)
-@_documentation(visibility: private)
-#endif
-public func FfiConverterTypeAccountFilter_lift(_ buf: RustBuffer) throws -> AccountFilter {
-    return try FfiConverterTypeAccountFilter.lift(buf)
-}
-
-#if swift(>=5.8)
-@_documentation(visibility: private)
-#endif
-public func FfiConverterTypeAccountFilter_lower(_ value: AccountFilter) -> RustBuffer {
-    return FfiConverterTypeAccountFilter.lower(value)
-}
-
 
 // Note that we don't yet support `indirect` for enums.
 // See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
@@ -2759,142 +2633,6 @@ public func FfiConverterTypeDialogInput_lower(_ value: DialogInput) -> RustBuffe
 // Note that we don't yet support `indirect` for enums.
 // See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
 /**
- * Filters for the connection lookup
- *
- * String filters look for the given value anywhere in the related field, case-insensitive.
- */
-
-public enum SearchFilter: Equatable, Hashable {
-    
-    /**
-     * List of [`ConnectionType`]s to consider.
-     */
-    case types(types: [ConnectionType]
-    )
-    /**
-     * List of [`CountryCode`]s to consider.
-     */
-    case countries(countries: [CountryCode]
-    )
-    /**
-     * String filter for the provider / product name or any alias.
-     */
-    case name(name: String
-    )
-    /**
-     * String filter for the BIC.
-     */
-    case bic(bic: String
-    )
-    /**
-     * String filter for the (national) bank code.
-     */
-    case bankCode(bankCode: String
-    )
-    /**
-     * String filter for any of those fields.
-     */
-    case term(term: String
-    )
-
-
-
-
-
-}
-
-#if compiler(>=6)
-extension SearchFilter: Sendable {}
-#endif
-
-#if swift(>=5.8)
-@_documentation(visibility: private)
-#endif
-public struct FfiConverterTypeSearchFilter: FfiConverterRustBuffer {
-    typealias SwiftType = SearchFilter
-
-    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SearchFilter {
-        let variant: Int32 = try readInt(&buf)
-        switch variant {
-        
-        case 1: return .types(types: try FfiConverterSequenceTypeConnectionType.read(from: &buf)
-        )
-        
-        case 2: return .countries(countries: try FfiConverterSequenceTypeCountryCode.read(from: &buf)
-        )
-        
-        case 3: return .name(name: try FfiConverterString.read(from: &buf)
-        )
-        
-        case 4: return .bic(bic: try FfiConverterString.read(from: &buf)
-        )
-        
-        case 5: return .bankCode(bankCode: try FfiConverterString.read(from: &buf)
-        )
-        
-        case 6: return .term(term: try FfiConverterString.read(from: &buf)
-        )
-        
-        default: throw UniffiInternalError.unexpectedEnumCase
-        }
-    }
-
-    public static func write(_ value: SearchFilter, into buf: inout [UInt8]) {
-        switch value {
-        
-        
-        case let .types(types):
-            writeInt(&buf, Int32(1))
-            FfiConverterSequenceTypeConnectionType.write(types, into: &buf)
-            
-        
-        case let .countries(countries):
-            writeInt(&buf, Int32(2))
-            FfiConverterSequenceTypeCountryCode.write(countries, into: &buf)
-            
-        
-        case let .name(name):
-            writeInt(&buf, Int32(3))
-            FfiConverterString.write(name, into: &buf)
-            
-        
-        case let .bic(bic):
-            writeInt(&buf, Int32(4))
-            FfiConverterString.write(bic, into: &buf)
-            
-        
-        case let .bankCode(bankCode):
-            writeInt(&buf, Int32(5))
-            FfiConverterString.write(bankCode, into: &buf)
-            
-        
-        case let .term(term):
-            writeInt(&buf, Int32(6))
-            FfiConverterString.write(term, into: &buf)
-            
-        }
-    }
-}
-
-
-#if swift(>=5.8)
-@_documentation(visibility: private)
-#endif
-public func FfiConverterTypeSearchFilter_lift(_ buf: RustBuffer) throws -> SearchFilter {
-    return try FfiConverterTypeSearchFilter.lift(buf)
-}
-
-#if swift(>=5.8)
-@_documentation(visibility: private)
-#endif
-public func FfiConverterTypeSearchFilter_lower(_ value: SearchFilter) -> RustBuffer {
-    return FfiConverterTypeSearchFilter.lower(value)
-}
-
-
-// Note that we don't yet support `indirect` for enums.
-// See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
-/**
  * Response from YAXI Open Banking services.
  *
  * The response either carries an authenticated result
@@ -3275,54 +3013,6 @@ fileprivate struct FfiConverterOptionTypeAccountFilter: FfiConverterRustBuffer {
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
-fileprivate struct FfiConverterOptionTypeAccountStatus: FfiConverterRustBuffer {
-    typealias SwiftType = AccountStatus?
-
-    public static func write(_ value: SwiftType, into buf: inout [UInt8]) {
-        guard let value = value else {
-            writeInt(&buf, Int8(0))
-            return
-        }
-        writeInt(&buf, Int8(1))
-        FfiConverterTypeAccountStatus.write(value, into: &buf)
-    }
-
-    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SwiftType {
-        switch try readInt(&buf) as Int8 {
-        case 0: return nil
-        case 1: return try FfiConverterTypeAccountStatus.read(from: &buf)
-        default: throw UniffiInternalError.unexpectedOptionalTag
-        }
-    }
-}
-
-#if swift(>=5.8)
-@_documentation(visibility: private)
-#endif
-fileprivate struct FfiConverterOptionTypeAccountType: FfiConverterRustBuffer {
-    typealias SwiftType = AccountType?
-
-    public static func write(_ value: SwiftType, into buf: inout [UInt8]) {
-        guard let value = value else {
-            writeInt(&buf, Int8(0))
-            return
-        }
-        writeInt(&buf, Int8(1))
-        FfiConverterTypeAccountType.write(value, into: &buf)
-    }
-
-    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SwiftType {
-        switch try readInt(&buf) as Int8 {
-        case 0: return nil
-        case 1: return try FfiConverterTypeAccountType.read(from: &buf)
-        default: throw UniffiInternalError.unexpectedOptionalTag
-        }
-    }
-}
-
-#if swift(>=5.8)
-@_documentation(visibility: private)
-#endif
 fileprivate struct FfiConverterOptionTypeDialogContext: FfiConverterRustBuffer {
     typealias SwiftType = DialogContext?
 
@@ -3618,48 +3308,23 @@ fileprivate struct FfiConverterSequenceTypeAccountField: FfiConverterRustBuffer 
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
-fileprivate struct FfiConverterSequenceTypeConnectionType: FfiConverterRustBuffer {
-    typealias SwiftType = [ConnectionType]
+fileprivate struct FfiConverterSequenceTypeDetails: FfiConverterRustBuffer {
+    typealias SwiftType = [Details]
 
-    public static func write(_ value: [ConnectionType], into buf: inout [UInt8]) {
+    public static func write(_ value: [Details], into buf: inout [UInt8]) {
         let len = Int32(value.count)
         writeInt(&buf, len)
         for item in value {
-            FfiConverterTypeConnectionType.write(item, into: &buf)
+            FfiConverterTypeDetails.write(item, into: &buf)
         }
     }
 
-    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> [ConnectionType] {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> [Details] {
         let len: Int32 = try readInt(&buf)
-        var seq = [ConnectionType]()
+        var seq = [Details]()
         seq.reserveCapacity(Int(len))
         for _ in 0 ..< len {
-            seq.append(try FfiConverterTypeConnectionType.read(from: &buf))
-        }
-        return seq
-    }
-}
-
-#if swift(>=5.8)
-@_documentation(visibility: private)
-#endif
-fileprivate struct FfiConverterSequenceTypeAccountFilter: FfiConverterRustBuffer {
-    typealias SwiftType = [AccountFilter]
-
-    public static func write(_ value: [AccountFilter], into buf: inout [UInt8]) {
-        let len = Int32(value.count)
-        writeInt(&buf, len)
-        for item in value {
-            FfiConverterTypeAccountFilter.write(item, into: &buf)
-        }
-    }
-
-    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> [AccountFilter] {
-        let len: Int32 = try readInt(&buf)
-        var seq = [AccountFilter]()
-        seq.reserveCapacity(Int(len))
-        for _ in 0 ..< len {
-            seq.append(try FfiConverterTypeAccountFilter.read(from: &buf))
+            seq.append(try FfiConverterTypeDetails.read(from: &buf))
         }
         return seq
     }
@@ -3685,31 +3350,6 @@ fileprivate struct FfiConverterSequenceTypeSearchFilter: FfiConverterRustBuffer 
         seq.reserveCapacity(Int(len))
         for _ in 0 ..< len {
             seq.append(try FfiConverterTypeSearchFilter.read(from: &buf))
-        }
-        return seq
-    }
-}
-
-#if swift(>=5.8)
-@_documentation(visibility: private)
-#endif
-fileprivate struct FfiConverterSequenceTypeCountryCode: FfiConverterRustBuffer {
-    typealias SwiftType = [CountryCode]
-
-    public static func write(_ value: [CountryCode], into buf: inout [UInt8]) {
-        let len = Int32(value.count)
-        writeInt(&buf, len)
-        for item in value {
-            FfiConverterTypeCountryCode.write(item, into: &buf)
-        }
-    }
-
-    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> [CountryCode] {
-        let len: Int32 = try readInt(&buf)
-        var seq = [CountryCode]()
-        seq.reserveCapacity(Int(len))
-        for _ in 0 ..< len {
-            seq.append(try FfiConverterTypeCountryCode.read(from: &buf))
         }
         return seq
     }
@@ -3896,76 +3536,76 @@ private let initializationResult: InitializationResult = {
     if (uniffi_routex_client_uniffi_checksum_method_authenticatedtransferresult_to_data() != 2336) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_routex_client_uniffi_checksum_method_routexclient_accounts() != 8029) {
+    if (uniffi_routex_client_uniffi_checksum_method_routexclient_accounts() != 1966) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_routex_client_uniffi_checksum_method_routexclient_balances() != 39399) {
+    if (uniffi_routex_client_uniffi_checksum_method_routexclient_balances() != 48820) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_routex_client_uniffi_checksum_method_routexclient_collect_payment() != 15899) {
+    if (uniffi_routex_client_uniffi_checksum_method_routexclient_collect_payment() != 59130) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_routex_client_uniffi_checksum_method_routexclient_confirm_accounts() != 2256) {
+    if (uniffi_routex_client_uniffi_checksum_method_routexclient_confirm_accounts() != 18320) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_routex_client_uniffi_checksum_method_routexclient_confirm_balances() != 27344) {
+    if (uniffi_routex_client_uniffi_checksum_method_routexclient_confirm_balances() != 31018) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_routex_client_uniffi_checksum_method_routexclient_confirm_collect_payment() != 38594) {
+    if (uniffi_routex_client_uniffi_checksum_method_routexclient_confirm_collect_payment() != 25061) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_routex_client_uniffi_checksum_method_routexclient_confirm_transactions() != 54091) {
+    if (uniffi_routex_client_uniffi_checksum_method_routexclient_confirm_transactions() != 45234) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_routex_client_uniffi_checksum_method_routexclient_confirm_transfer() != 21005) {
+    if (uniffi_routex_client_uniffi_checksum_method_routexclient_confirm_transfer() != 7931) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_routex_client_uniffi_checksum_method_routexclient_info() != 64998) {
+    if (uniffi_routex_client_uniffi_checksum_method_routexclient_info() != 14817) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_routex_client_uniffi_checksum_method_routexclient_register_redirect_uri() != 3136) {
+    if (uniffi_routex_client_uniffi_checksum_method_routexclient_register_redirect_uri() != 50544) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_routex_client_uniffi_checksum_method_routexclient_respond_accounts() != 27191) {
+    if (uniffi_routex_client_uniffi_checksum_method_routexclient_respond_accounts() != 50239) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_routex_client_uniffi_checksum_method_routexclient_respond_balances() != 45973) {
+    if (uniffi_routex_client_uniffi_checksum_method_routexclient_respond_balances() != 33866) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_routex_client_uniffi_checksum_method_routexclient_respond_collect_payment() != 5835) {
+    if (uniffi_routex_client_uniffi_checksum_method_routexclient_respond_collect_payment() != 61668) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_routex_client_uniffi_checksum_method_routexclient_respond_transactions() != 18466) {
+    if (uniffi_routex_client_uniffi_checksum_method_routexclient_respond_transactions() != 49121) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_routex_client_uniffi_checksum_method_routexclient_respond_transfer() != 64431) {
+    if (uniffi_routex_client_uniffi_checksum_method_routexclient_respond_transfer() != 63916) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_routex_client_uniffi_checksum_method_routexclient_search() != 59087) {
+    if (uniffi_routex_client_uniffi_checksum_method_routexclient_search() != 1929) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_routex_client_uniffi_checksum_method_routexclient_set_redirect_uri() != 22586) {
+    if (uniffi_routex_client_uniffi_checksum_method_routexclient_set_redirect_uri() != 62051) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_routex_client_uniffi_checksum_method_routexclient_settle_key() != 17822) {
+    if (uniffi_routex_client_uniffi_checksum_method_routexclient_settle_key() != 55503) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_routex_client_uniffi_checksum_method_routexclient_system_version() != 57787) {
+    if (uniffi_routex_client_uniffi_checksum_method_routexclient_system_version() != 43883) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_routex_client_uniffi_checksum_method_routexclient_trace() != 49199) {
+    if (uniffi_routex_client_uniffi_checksum_method_routexclient_trace() != 59867) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_routex_client_uniffi_checksum_method_routexclient_trace_id() != 58761) {
+    if (uniffi_routex_client_uniffi_checksum_method_routexclient_trace_id() != 8635) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_routex_client_uniffi_checksum_method_routexclient_transactions() != 38307) {
+    if (uniffi_routex_client_uniffi_checksum_method_routexclient_transactions() != 15229) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_routex_client_uniffi_checksum_method_routexclient_transfer() != 7445) {
+    if (uniffi_routex_client_uniffi_checksum_method_routexclient_transfer() != 27823) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_routex_client_uniffi_checksum_constructor_routexclient_new() != 13848) {
+    if (uniffi_routex_client_uniffi_checksum_constructor_routexclient_new() != 28245) {
         return InitializationResult.apiChecksumMismatch
     }
 

@@ -787,13 +787,15 @@ public struct Balance: Equatable, Hashable {
     public var amount: Decimal
     public var currency: String
     public var balanceType: BalanceType
+    public var creditLimitIncluded: Bool?
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(amount: Decimal, currency: String, balanceType: BalanceType) {
+    public init(amount: Decimal, currency: String, balanceType: BalanceType, creditLimitIncluded: Bool? = nil) {
         self.amount = amount
         self.currency = currency
         self.balanceType = balanceType
+        self.creditLimitIncluded = creditLimitIncluded
     }
 
     
@@ -814,7 +816,8 @@ public struct FfiConverterTypeBalance: FfiConverterRustBuffer {
             try Balance(
                 amount: FfiConverterTypeDecimal.read(from: &buf), 
                 currency: FfiConverterString.read(from: &buf), 
-                balanceType: FfiConverterTypeBalanceType.read(from: &buf)
+                balanceType: FfiConverterTypeBalanceType.read(from: &buf), 
+                creditLimitIncluded: FfiConverterOptionBool.read(from: &buf)
         )
     }
 
@@ -822,6 +825,7 @@ public struct FfiConverterTypeBalance: FfiConverterRustBuffer {
         FfiConverterTypeDecimal.write(value.amount, into: &buf)
         FfiConverterString.write(value.currency, into: &buf)
         FfiConverterTypeBalanceType.write(value.balanceType, into: &buf)
+        FfiConverterOptionBool.write(value.creditLimitIncluded, into: &buf)
     }
 }
 
@@ -847,7 +851,7 @@ public struct Balances: Equatable, Hashable {
      */
     public var balances: [AccountBalances]
     /**
-     * Accounts that were requested in [`Request::accounts`] but not found.
+     * Accounts that were requested but not found.
      */
     public var missingAccounts: [AccountReference]
 
@@ -858,7 +862,7 @@ public struct Balances: Equatable, Hashable {
          * List of balances for accounts.
          */balances: [AccountBalances], 
         /**
-         * Accounts that were requested in [`Request::accounts`] but not found.
+         * Accounts that were requested but not found.
          */missingAccounts: [AccountReference] = []) {
         self.balances = balances
         self.missingAccounts = missingAccounts
@@ -1235,6 +1239,12 @@ public struct ConnectionInfo: Equatable, Hashable {
      * Logo identifier.
      */
     public var logoId: String
+    /**
+     * ISO 20022 BICFIIdentifiers.
+     *
+     * Note that this is only included in search results if requested.
+     */
+    public var bics: [String]?
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
@@ -1262,7 +1272,12 @@ public struct ConnectionInfo: Equatable, Hashable {
          */advice: String? = nil, 
         /**
          * Logo identifier.
-         */logoId: String) {
+         */logoId: String, 
+        /**
+         * ISO 20022 BICFIIdentifiers.
+         *
+         * Note that this is only included in search results if requested.
+         */bics: [String]? = nil) {
         self.id = id
         self.countries = countries
         self.displayName = displayName
@@ -1271,6 +1286,7 @@ public struct ConnectionInfo: Equatable, Hashable {
         self.password = password
         self.advice = advice
         self.logoId = logoId
+        self.bics = bics
     }
 
     
@@ -1296,7 +1312,8 @@ public struct FfiConverterTypeConnectionInfo: FfiConverterRustBuffer {
                 userId: FfiConverterOptionString.read(from: &buf), 
                 password: FfiConverterOptionString.read(from: &buf), 
                 advice: FfiConverterOptionString.read(from: &buf), 
-                logoId: FfiConverterString.read(from: &buf)
+                logoId: FfiConverterString.read(from: &buf), 
+                bics: FfiConverterOptionSequenceString.read(from: &buf)
         )
     }
 
@@ -1309,6 +1326,7 @@ public struct FfiConverterTypeConnectionInfo: FfiConverterRustBuffer {
         FfiConverterOptionString.write(value.password, into: &buf)
         FfiConverterOptionString.write(value.advice, into: &buf)
         FfiConverterString.write(value.logoId, into: &buf)
+        FfiConverterOptionSequenceString.write(value.bics, into: &buf)
     }
 }
 
@@ -2509,6 +2527,69 @@ public func FfiConverterTypeConnectionType_lower(_ value: ConnectionType) -> Rus
 
 // Note that we don't yet support `indirect` for enums.
 // See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
+/**
+ * Details to contain in search results.
+ */
+
+public enum Details: Equatable, Hashable {
+    
+    case bics
+
+
+
+
+
+}
+
+#if compiler(>=6)
+extension Details: Sendable {}
+#endif
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public struct FfiConverterTypeDetails: FfiConverterRustBuffer {
+    typealias SwiftType = Details
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> Details {
+        let variant: Int32 = try readInt(&buf)
+        switch variant {
+        
+        case 1: return .bics
+        
+        default: throw UniffiInternalError.unexpectedEnumCase
+        }
+    }
+
+    public static func write(_ value: Details, into buf: inout [UInt8]) {
+        switch value {
+        
+        
+        case .bics:
+            writeInt(&buf, Int32(1))
+        
+        }
+    }
+}
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeDetails_lift(_ buf: RustBuffer) throws -> Details {
+    return try FfiConverterTypeDetails.lift(buf)
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeDetails_lower(_ value: Details) -> RustBuffer {
+    return FfiConverterTypeDetails.lower(value)
+}
+
+
+// Note that we don't yet support `indirect` for enums.
+// See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
 
 public enum Field: Equatable, Hashable {
     
@@ -2906,6 +2987,30 @@ fileprivate struct FfiConverterOptionUInt32: FfiConverterRustBuffer {
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
+fileprivate struct FfiConverterOptionBool: FfiConverterRustBuffer {
+    typealias SwiftType = Bool?
+
+    public static func write(_ value: SwiftType, into buf: inout [UInt8]) {
+        guard let value = value else {
+            writeInt(&buf, Int8(0))
+            return
+        }
+        writeInt(&buf, Int8(1))
+        FfiConverterBool.write(value, into: &buf)
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SwiftType {
+        switch try readInt(&buf) as Int8 {
+        case 0: return nil
+        case 1: return try FfiConverterBool.read(from: &buf)
+        default: throw UniffiInternalError.unexpectedOptionalTag
+        }
+    }
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
 fileprivate struct FfiConverterOptionString: FfiConverterRustBuffer {
     typealias SwiftType = String?
 
@@ -3138,6 +3243,30 @@ fileprivate struct FfiConverterOptionTypeChargeBearer: FfiConverterRustBuffer {
         switch try readInt(&buf) as Int8 {
         case 0: return nil
         case 1: return try FfiConverterTypeChargeBearer.read(from: &buf)
+        default: throw UniffiInternalError.unexpectedOptionalTag
+        }
+    }
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+fileprivate struct FfiConverterOptionSequenceString: FfiConverterRustBuffer {
+    typealias SwiftType = [String]?
+
+    public static func write(_ value: SwiftType, into buf: inout [UInt8]) {
+        guard let value = value else {
+            writeInt(&buf, Int8(0))
+            return
+        }
+        writeInt(&buf, Int8(1))
+        FfiConverterSequenceString.write(value, into: &buf)
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SwiftType {
+        switch try readInt(&buf) as Int8 {
+        case 0: return nil
+        case 1: return try FfiConverterSequenceString.read(from: &buf)
         default: throw UniffiInternalError.unexpectedOptionalTag
         }
     }
