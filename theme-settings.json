@@ -1,0 +1,16 @@
+{
+  "theme": {
+    "color": {
+      "documentation-intro-fill": {
+        "light": "linear-gradient(135deg, #faf9f7, #ffe3ee)",
+        "dark": "linear-gradient(135deg, #1a1a2e, #3a1226)"
+      }
+    }
+  },
+  "features": {
+    "docs": {
+      "onThisPageNavigator": true,
+      "quickNavigation": true
+    }
+  }
+}

@@ -1,0 +1,136 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  check:
+    name: Build & test
+    runs-on: macos-15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - run: swift --version
+      - run: make build test
+
+  platforms:
+    name: Build ${{ matrix.name }}
+    needs: check
+    runs-on: macos-15
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: iOS
+            destination: generic/platform=iOS
+          - name: Mac Catalyst
+            destination: generic/platform=macOS,variant=Mac Catalyst
+          - name: tvOS
+            destination: generic/platform=tvOS
+          - name: watchOS
+            destination: generic/platform=watchOS
+    steps:
+      - uses: actions/checkout@v7
+      - run: xcodebuild build -scheme routex-client-swift-Package -destination '${{ matrix.destination }}'
+
+  linux:
+    name: Build & test on Linux (swift ${{ matrix.swift }})
+    runs-on: ubuntu-latest
+    container: swift:${{ matrix.swift }}
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        swift: ["6.1", "6.3"]
+    steps:
+      - uses: actions/checkout@v7
+      - run: swift build
+      - run: swift test
+
+  detect-online-secrets:
+    name: Detect online-test secrets
+    runs-on: ubuntu-latest
+    permissions: {}
+    outputs:
+      available: ${{ steps.probe.outputs.available }}
+    steps:
+      - id: probe
+        env:
+          PROBE: ${{ secrets.YAXI_API_URL }}
+        run: |
+          if [ -n "$PROBE" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Online tests will be skipped: YAXI_API_URL not available (typical for forked PRs)."
+          fi
+
+  online-tests:
+    name: Online tests
+    needs: [check, detect-online-secrets]
+    if: needs.detect-online-secrets.outputs.available == 'true'
+    runs-on: macos-15
+    permissions:
+      contents: read
+    env:
+      YAXI_API_URL: ${{ secrets.YAXI_API_URL }}
+      YAXI_API_KEY_ID: test
+      YAXI_API_KEY_SECRET: ${{ secrets.YAXI_API_KEY_SECRET }}
+    steps:
+      - uses: actions/checkout@v7
+      # The whole suite, not a filter: the live suites enable themselves off the
+      # env above, so a filter that stops matching would pass silently.
+      - run: swift test
+
+  docs:
+    name: Render API docs
+    needs: check
+    runs-on: macos-15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - run: make docs HOSTING_BASE_PATH=routex-client-swift
+      # DocC copies its renderer assets out of a template directory and can drop
+      # them silently, publishing a blank site. Fail loudly instead.
+      - name: Assert the rendered site is complete
+        run: |
+          test -s Documentation/index.html
+          test -s Documentation/documentation/index.html
+          test -s Documentation/documentation/routexclient/index.html
+          test -n "$(ls -A Documentation/js)"
+          test -s Documentation/theme-settings.json
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: Documentation
+
+  deploy-docs:
+    name: Deploy API docs to GitHub Pages
+    needs: docs
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
