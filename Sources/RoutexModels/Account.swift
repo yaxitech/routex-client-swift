@@ -7,9 +7,10 @@ import Foundation
 public struct Account: Sendable, Hashable, Codable {
     /// ISO 20022 IBAN2007Identifier.
     public let iban: String?
-    /// Account number that is not an IBAN, e.g. ISO 20022 BBANIdentifier or
-    /// primary account number (PAN) of a card account.
+    /// Account number that is not an IBAN, e.g. ISO 20022 BBANIdentifier.
     public let number: String?
+    /// Masked payment card number.
+    public let maskedPan: String?
     /// ISO 20022 BICFIIdentifier.
     public let bic: String?
     /// National bank code.
@@ -34,6 +35,7 @@ public struct Account: Sendable, Hashable, Codable {
     public init(
         iban: String? = nil,
         number: String? = nil,
+        maskedPan: String? = nil,
         bic: String? = nil,
         bankCode: String? = nil,
         currency: String? = nil,
@@ -46,6 +48,7 @@ public struct Account: Sendable, Hashable, Codable {
     ) {
         self.iban = iban
         self.number = number
+        self.maskedPan = maskedPan
         self.bic = bic
         self.bankCode = bankCode
         self.currency = currency

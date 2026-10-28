@@ -65,6 +65,22 @@ struct RoutexTicketIssuerTests {
         #expect((data["range"] as? [String: Any])?["reference"] as? String == "abc")
     }
 
+    // MARK: - standingOrders
+
+    @Test("standingOrders ticket encodes the account")
+    func standingOrdersAccount() throws {
+        let raw = try issuer().standingOrders(
+            account: AccountReference(id: .iban("DE02120300000000202051"), currency: "EUR")
+        ).raw
+        let (_, payload) = Self.decode(raw)
+        #expect((payload["data"] as? [String: Any])?["service"] as? String == "StandingOrders")
+        let data = Self.ticketData(raw)
+        #expect(data.keys.sorted() == ["account"])
+        let account = try #require(data["account"] as? [String: Any])
+        #expect(account["iban"] as? String == "DE02120300000000202051")
+        #expect(account["currency"] as? String == "EUR")
+    }
+
     // MARK: - collectPayment
 
     @Test("collectPayment omits optionals by default")

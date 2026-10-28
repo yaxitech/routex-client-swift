@@ -269,6 +269,59 @@ struct ClientIntegrationTests {
         #expect(recorded.first?.url.path.hasSuffix("transactions/confirmation") == true)
     }
 
+    @Test("confirmStandingOrders routes to standing-orders/confirmation")
+    func confirmStandingOrdersRouting() async throws {
+        let raw = Self.sampleTicket(service: "StandingOrders")
+        let ticket = try StandingOrdersTicket(raw)
+
+        let body = Data(#"{"InvalidCredentials":{"userMessage":"x"}}"#.utf8)
+        let transport = StubTransport([
+            HTTPResponse(status: 401, headers: [:], body: body)
+        ])
+        let core = RoutexClientCore(
+            baseURL: URL(string: "https://example")!,
+            transport: transport,
+            settlementFactory: { _ in PassthroughSettlement() }
+        )
+        let client = RoutexClient(core: core)
+
+        await #expect(throws: RoutexError.self) {
+            _ = try await client.confirmStandingOrders(
+                ticket: ticket,
+                context: ConfirmationContext(Data([1]))
+            )
+        }
+        let recorded = await transport.recorded()
+        #expect(recorded.first?.url.path.hasSuffix("standing-orders/confirmation") == true)
+    }
+
+    @Test("respondStandingOrders routes to standing-orders/response")
+    func respondStandingOrdersRouting() async throws {
+        let raw = Self.sampleTicket(service: "StandingOrders")
+        let ticket = try StandingOrdersTicket(raw)
+
+        let body = Data(#"{"InvalidCredentials":{"userMessage":"x"}}"#.utf8)
+        let transport = StubTransport([
+            HTTPResponse(status: 401, headers: [:], body: body)
+        ])
+        let core = RoutexClientCore(
+            baseURL: URL(string: "https://example")!,
+            transport: transport,
+            settlementFactory: { _ in PassthroughSettlement() }
+        )
+        let client = RoutexClient(core: core)
+
+        await #expect(throws: RoutexError.self) {
+            _ = try await client.respondStandingOrders(
+                ticket: ticket,
+                context: InputContext(Data([1])),
+                response: "133742"
+            )
+        }
+        let recorded = await transport.recorded()
+        #expect(recorded.first?.url.path.hasSuffix("standing-orders/response") == true)
+    }
+
     @Test("collectPayment sends the debtor account on the wire")
     func collectPaymentSendsDebtorAccount() async throws {
         let raw = Self.sampleTicket(service: "CollectPayment")

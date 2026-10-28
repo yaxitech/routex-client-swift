@@ -24,6 +24,12 @@ struct TransactionsRequestBody: Encodable, Sendable {
     var recurringConsents: Bool?
 }
 
+struct StandingOrdersRequestBody: Encodable, Sendable {
+    var credentials: Credentials
+    var session: Session?
+    var recurringConsents: Bool?
+}
+
 // Bodies of the services that also run without credentials. The server tells
 // them apart from the ones above by the `connectionData` key; `session` and the
 // service data fields carry over unchanged.

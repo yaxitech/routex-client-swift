@@ -96,6 +96,18 @@ public struct RoutexTicketIssuer: Sendable {
         )
     }
 
+    /// Issue a ticket for the standing orders service against `account`.
+    public func standingOrders(
+        account: AccountReference,
+        ticketID: UUID = UUID(),
+        ttl: TimeInterval? = nil
+    ) throws -> StandingOrdersTicket {
+        let data = StandingOrdersTicketData(account: account)
+        return try StandingOrdersTicket(
+            sign(service: "StandingOrders", data: data, ticketID: ticketID, ttl: ttl)
+        )
+    }
+
     /// Issue a ticket for the collect-payment service.
     ///
     /// - Parameters:

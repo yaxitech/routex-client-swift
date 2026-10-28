@@ -5,6 +5,7 @@ import Foundation
 public enum AccountField: String, Sendable, Hashable, Codable, CaseIterable {
     case iban = "Iban"
     case number = "Number"
+    case maskedPan = "MaskedPan"
     case bic = "Bic"
     case bankCode = "BankCode"
     case currency = "Currency"

@@ -51,10 +51,6 @@ public struct Transaction: Sendable, Hashable, Codable {
     /// Bank transaction codes.
     public let bankTransactionCodes: [BankTransactionCode]
     /// Additional information attached to the transaction.
-    ///
-    /// May be a proprietary, localized, human-readable long text
-    /// corresponding to some machine-readable bank transaction code that is
-    /// not directly provided by the bank.
     public let additionalInformation: String?
 
     /// Build a `Transaction`.

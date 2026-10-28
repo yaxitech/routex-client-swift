@@ -20,32 +20,40 @@ format-check:
 lint:
 	swift format lint --strict --recursive Sources Tests Package.swift
 
+# Shared shell prelude for the coverage targets. Sets PROFDATA and OBJS
+# (the first test binary, plus "-object <path>" for each additional one).
+COV_RESOLVE = set -eu; \
+  BIN=$$(swift build --show-bin-path); \
+  CODECOV_JSON=$$(swift test --show-codecov-path); \
+  PROFDATA=$$(dirname "$$CODECOV_JSON")/default.profdata; \
+  [ -f "$$PROFDATA" ] || { echo "error: no profdata at $$PROFDATA" >&2; exit 1; }; \
+  OBJS=; \
+  for B in "$$BIN"/*.xctest "$$BIN"/*.so; do \
+    [ -e "$$B" ] || continue; \
+    N=$$(basename "$$B" .xctest); \
+    if [ -f "$$B/Contents/MacOS/$$N" ]; then E="$$B/Contents/MacOS/$$N"; else E="$$B"; fi; \
+    if [ -z "$$OBJS" ]; then OBJS="$$E"; else OBJS="$$OBJS -object $$E"; fi; \
+  done; \
+  [ -n "$$OBJS" ] || { echo "error: no test binaries in $$BIN" >&2; exit 1; };
+
 # Run tests with coverage instrumentation and print a per-file summary.
 coverage:
 	swift test --enable-code-coverage
-	@BIN=$$(swift build --show-bin-path); \
-	  XCTEST=$$(ls $$BIN | grep PackageTests.xctest | head -1); \
-	  EXE=$$BIN/$$XCTEST/Contents/MacOS/$${XCTEST%.xctest}; \
-	  [ -f "$$EXE" ] || EXE=$$BIN/$$XCTEST; \
-	  PROFDATA=$$BIN/codecov/default.profdata; \
-	  xcrun llvm-cov report "$$EXE" \
+	@$(COV_RESOLVE) \
+	  xcrun llvm-cov report $$OBJS \
 	    -instr-profile="$$PROFDATA" \
 	    -ignore-filename-regex='\.build|Tests'
 
 # Generate an LCOV report at .build/coverage/coverage.lcov plus an HTML report.
 coverage-html:
 	swift test --enable-code-coverage
-	@BIN=$$(swift build --show-bin-path); \
-	  XCTEST=$$(ls $$BIN | grep PackageTests.xctest | head -1); \
-	  EXE=$$BIN/$$XCTEST/Contents/MacOS/$${XCTEST%.xctest}; \
-	  [ -f "$$EXE" ] || EXE=$$BIN/$$XCTEST; \
-	  PROFDATA=$$BIN/codecov/default.profdata; \
+	@$(COV_RESOLVE) \
 	  mkdir -p .build/coverage; \
-	  xcrun llvm-cov export "$$EXE" \
+	  xcrun llvm-cov export $$OBJS \
 	    -instr-profile="$$PROFDATA" \
 	    -ignore-filename-regex='\.build|Tests' \
 	    -format=lcov > .build/coverage/coverage.lcov; \
-	  xcrun llvm-cov show "$$EXE" \
+	  xcrun llvm-cov show $$OBJS \
 	    -instr-profile="$$PROFDATA" \
 	    -ignore-filename-regex='\.build|Tests' \
 	    -format=html \

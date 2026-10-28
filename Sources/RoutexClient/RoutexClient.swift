@@ -41,10 +41,10 @@ import RoutexTransport
 ///
 /// ## Running without credentials
 ///
-/// The accounts, balances, and transactions services also accept
-/// `connectionData:` in place of `credentials:`, running against the
-/// consent an earlier flow established and assuming the user is in
-/// session on the connection. The response is a regular `Response`, so
+/// The accounts, balances, and transactions services
+/// also accept `connectionData:` in place of `credentials:`, running
+/// against the consent an earlier flow established and assuming the user
+/// is in session on the connection. The response is a regular `Response`, so
 /// interrupts stay possible; a request the bank will not serve without
 /// authenticating the user fails with `RoutexError.interruptError`.
 /// `recurringConsents` has no counterpart here, as no consent gets
@@ -80,6 +80,7 @@ import RoutexTransport
 /// - ``accounts(ticket:credentials:fields:filter:session:recurringConsents:)``
 /// - ``balances(ticket:credentials:accounts:session:recurringConsents:)``
 /// - ``transactions(ticket:credentials:session:recurringConsents:)``
+/// - ``standingOrders(ticket:credentials:session:recurringConsents:)``
 /// - ``collectPayment(ticket:credentials:account:session:recurringConsents:)``
 /// - ``transfer(ticket:credentials:product:details:debtorAccount:debtorName:requestedExecutionDate:session:recurringConsents:)``
 ///
@@ -97,6 +98,8 @@ import RoutexTransport
 /// - ``respondBalances(ticket:context:response:)``
 /// - ``confirmTransactions(ticket:context:)``
 /// - ``respondTransactions(ticket:context:response:)``
+/// - ``confirmStandingOrders(ticket:context:)``
+/// - ``respondStandingOrders(ticket:context:response:)``
 /// - ``confirmCollectPayment(ticket:context:)``
 /// - ``respondCollectPayment(ticket:context:response:)``
 /// - ``confirmTransfer(ticket:context:)``
@@ -452,6 +455,33 @@ public final class RoutexClient: Sendable {
     }
 
     /// Invoke the
+    /// [standing orders service](https://docs.yaxi.tech/standing-orders.html):
+    /// fetch the standing orders authorized by `credentials`.
+    ///
+    /// - Parameters:
+    ///   - ticket: Backend-issued `StandingOrdersTicket` authorizing the
+    ///     call. The account is baked into the ticket.
+    ///   - credentials: User credentials envelope (see `Credentials`).
+    ///   - session: Optional `Session` returned by a previous call in the
+    ///     same flow.
+    ///   - recurringConsents: When `true`, request a long-lived consent
+    ///     so the returned `ConnectionData` can be replayed on later
+    ///     calls.
+    public func standingOrders(
+        ticket: StandingOrdersTicket,
+        credentials: Credentials,
+        session: Session? = nil,
+        recurringConsents: Bool = false
+    ) async throws -> Response<StandingOrdersResult> {
+        let body = StandingOrdersRequestBody(
+            credentials: credentials,
+            session: session,
+            recurringConsents: recurringConsents ? true : nil
+        )
+        return try await execute(ticket: ticket, path: "standing-orders/service", body: body)
+    }
+
+    /// Invoke the
     /// [collect-payment service](https://docs.yaxi.tech/collect-payment.html):
     /// identify the debtor and prepare a payment-initiation flow.
     ///
@@ -635,6 +665,41 @@ public final class RoutexClient: Sendable {
         context: InputContext,
         response: String
     ) async throws -> Response<TransactionsResult> {
+        try await resume(ticket: ticket, context: context, response: response)
+    }
+
+    /// Continue a `standingOrders` flow paused on a confirmation
+    /// `Response.dialog(_:)`, `Response.redirect(_:)`, or
+    /// `Response.redirectHandle(_:)`.
+    ///
+    /// - Parameters:
+    ///   - ticket: The same `StandingOrdersTicket` that returned the prior
+    ///     response.
+    ///   - context: `ConfirmationContext` taken from the
+    ///     `Response.dialog(_:)`, `Response.redirect(_:)`, or
+    ///     `Response.redirectHandle(_:)` returned by the prior call.
+    public func confirmStandingOrders(
+        ticket: StandingOrdersTicket,
+        context: ConfirmationContext
+    ) async throws -> Response<StandingOrdersResult> {
+        try await resume(ticket: ticket, context: context)
+    }
+
+    /// Continue a `standingOrders` flow by submitting the user's answer
+    /// to a `Response.dialog(_:)`.
+    ///
+    /// - Parameters:
+    ///   - ticket: The same `StandingOrdersTicket` that returned the
+    ///     dialog.
+    ///   - context: `InputContext` taken from the dialog's input on the
+    ///     prior `Response.dialog(_:)`.
+    ///   - response: The user's answer; see `DialogInput` for the format
+    ///     expected by each input variant.
+    public func respondStandingOrders(
+        ticket: StandingOrdersTicket,
+        context: InputContext,
+        response: String
+    ) async throws -> Response<StandingOrdersResult> {
         try await resume(ticket: ticket, context: context, response: response)
     }
 

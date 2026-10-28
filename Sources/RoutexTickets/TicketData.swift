@@ -56,6 +56,10 @@ struct TransactionsTicketData: Encodable {
     let webhook: URL?
 }
 
+struct StandingOrdersTicketData: Encodable {
+    let account: AccountReference
+}
+
 struct CollectPaymentTicketData: Encodable {
     let amount: Amount
     let creditorAccount: CreditorAccountIdentifier

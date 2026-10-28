@@ -1,10 +1,11 @@
 import Foundation
 
-/// Reference to an account by IBAN or non-IBAN account number, used by the
-/// account-information services. Carries an optional currency to disambiguate
+/// Reference to an account by IBAN, non-IBAN account number or masked payment
+/// card number, used by the account-information services. Carries an optional currency to disambiguate
 /// multi-currency accounts.
 public struct AccountReference: Sendable, Hashable, Codable {
-    /// Account identifier: an IBAN or a non-IBAN account number.
+    /// Account identifier: an IBAN, a non-IBAN account number or a masked
+    /// payment card number.
     public var id: AccountIdentifier
     /// ISO 4217 Alpha 3 currency code. `nil` means "any currency".
     public var currency: String?
@@ -18,7 +19,7 @@ public struct AccountReference: Sendable, Hashable, Codable {
 
     /// The wire format flattens `id` into the parent object, e.g.
     /// `{"iban": "...", "currency": "..."}` or `{"number": "..."}`.
-    private enum CodingKeys: String, CodingKey { case iban, number, currency }
+    private enum CodingKeys: String, CodingKey { case iban, number, maskedPan, currency }
 
     public init(from decoder: any Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -26,11 +27,13 @@ public struct AccountReference: Sendable, Hashable, Codable {
             self.id = .iban(iban)
         } else if let number = try c.decodeIfPresent(String.self, forKey: .number) {
             self.id = .number(number)
+        } else if let maskedPan = try c.decodeIfPresent(String.self, forKey: .maskedPan) {
+            self.id = .maskedPan(maskedPan)
         } else {
             throw DecodingError.dataCorrupted(
                 .init(
                     codingPath: decoder.codingPath,
-                    debugDescription: "AccountReference missing 'iban' or 'number'"
+                    debugDescription: "AccountReference missing 'iban', 'number' or 'maskedPan'"
                 )
             )
         }
@@ -42,6 +45,7 @@ public struct AccountReference: Sendable, Hashable, Codable {
         switch id {
         case .iban(let v): try c.encode(v, forKey: .iban)
         case .number(let v): try c.encode(v, forKey: .number)
+        case .maskedPan(let v): try c.encode(v, forKey: .maskedPan)
         }
         try c.encodeIfPresent(currency, forKey: .currency)
     }

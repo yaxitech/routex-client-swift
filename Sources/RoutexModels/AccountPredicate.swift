@@ -9,6 +9,8 @@ public enum AccountPredicate: Sendable, Hashable {
     case iban(String?)
     /// Account number that is not an IBAN.
     case number(String?)
+    /// Masked payment card number.
+    case maskedPan(String?)
     /// ISO 20022 BICFIIdentifier.
     case bic(String?)
     /// National bank code.
@@ -33,6 +35,7 @@ public enum AccountPredicate: Sendable, Hashable {
         switch self {
         case .iban: return .iban
         case .number: return .number
+        case .maskedPan: return .maskedPan
         case .bic: return .bic
         case .bankCode: return .bankCode
         case .currency: return .currency
@@ -48,7 +51,7 @@ public enum AccountPredicate: Sendable, Hashable {
     /// Wire form of the compared value, `nil` for JSON `null`.
     var wireValue: String? {
         switch self {
-        case .iban(let v), .number(let v), .bic(let v), .bankCode(let v),
+        case .iban(let v), .number(let v), .maskedPan(let v), .bic(let v), .bankCode(let v),
             .currency(let v), .name(let v), .displayName(let v),
             .ownerName(let v), .productName(let v):
             return v
@@ -70,6 +73,7 @@ public enum AccountPredicate: Sendable, Hashable {
         switch field {
         case .iban: return .iban(wireValue)
         case .number: return .number(wireValue)
+        case .maskedPan: return .maskedPan(wireValue)
         case .bic: return .bic(wireValue)
         case .bankCode: return .bankCode(wireValue)
         case .currency: return .currency(wireValue)

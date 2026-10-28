@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.6.0] - 2026-10-28
+
+### Added
+
+- `standingOrders`, `respondStandingOrders` and `confirmStandingOrders`
+- `Account.maskedPan`, `AccountField.maskedPan` and `AccountPredicate.maskedPan`, the masked payment card number, and `AccountIdentifier.maskedPan` to reference a card account in the balances and transactions services
+
+### Changed
+
+- **Breaking:** `AccountIdentifier`, `AccountField` and `AccountPredicate` gain a `maskedPan` case, so exhaustive `switch` statements over them need an additional case.
+
 ## [0.5.0] - 2026-08-18
 
 Native Swift rewrite, replacing the UniFFI binding over the Rust core.

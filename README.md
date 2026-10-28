@@ -16,7 +16,7 @@ Requires Swift 6.1 or newer.
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/yaxitech/routex-client-swift", from: "0.5.0")
+    .package(url: "https://github.com/yaxitech/routex-client-swift", from: "0.6.0")
 ],
 targets: [
     .target(
@@ -88,8 +88,8 @@ if case .result(let result) = response {
     //   Verify the signature in a trusted environment before acting on the data.
     // result.session: short-lived, pass to consecutive service calls to speed up authentication
     // result.connectionData: persist alongside credentials to reuse the consent on
-    //   subsequent calls (via Credentials.connectionData), to run accounts, balances, or
-    //   transactions without credentials (pass it as connectionData:), or for
+    //   subsequent calls (via Credentials.connectionData), to run accounts, balances,
+    //   or transactions without credentials (pass it as connectionData:), or for
     //   non-interactive refreshes via RoutexRefreshClient. Pass recurringConsents: true
     //   on the service call to request a long-lived consent that skips the interrupt
     //   loop until it expires.

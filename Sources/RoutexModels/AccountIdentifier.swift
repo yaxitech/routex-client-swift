@@ -6,8 +6,10 @@ public enum AccountIdentifier: Sendable, Hashable, Codable {
     case iban(String)
     /// Account number that is not an IBAN, e.g. ISO 20022 BBANIdentifier.
     case number(String)
+    /// Masked payment card number.
+    case maskedPan(String)
 
-    private enum CodingKeys: String, CodingKey { case iban, number }
+    private enum CodingKeys: String, CodingKey { case iban, number, maskedPan }
 
     public init(from decoder: any Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -19,10 +21,14 @@ public enum AccountIdentifier: Sendable, Hashable, Codable {
             self = .number(v)
             return
         }
+        if let v = try c.decodeIfPresent(String.self, forKey: .maskedPan) {
+            self = .maskedPan(v)
+            return
+        }
         throw DecodingError.dataCorrupted(
             .init(
                 codingPath: decoder.codingPath,
-                debugDescription: "AccountIdentifier missing 'iban' or 'number' key"
+                debugDescription: "AccountIdentifier missing 'iban', 'number' or 'maskedPan' key"
             )
         )
     }
@@ -32,6 +38,7 @@ public enum AccountIdentifier: Sendable, Hashable, Codable {
         switch self {
         case .iban(let v): try c.encode(v, forKey: .iban)
         case .number(let v): try c.encode(v, forKey: .number)
+        case .maskedPan(let v): try c.encode(v, forKey: .maskedPan)
         }
     }
 }
