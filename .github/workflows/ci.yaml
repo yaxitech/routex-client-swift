@@ -14,25 +14,30 @@ concurrency:
 
 jobs:
   check:
-    name: Build & test
-    runs-on: macos-15
+    name: Build & test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     permissions:
       contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15, macos-26]
     steps:
       - uses: actions/checkout@v7
       - run: swift --version
       - run: make build test
 
   platforms:
-    name: Build ${{ matrix.name }}
+    name: Build ${{ matrix.platform.name }} (${{ matrix.os }})
     needs: check
-    runs-on: macos-15
+    runs-on: ${{ matrix.os }}
     permissions:
       contents: read
     strategy:
       fail-fast: false
       matrix:
-        include:
+        os: [macos-15, macos-26]
+        platform:
           - name: iOS
             destination: generic/platform=iOS
           - name: Mac Catalyst
@@ -43,7 +48,7 @@ jobs:
             destination: generic/platform=watchOS
     steps:
       - uses: actions/checkout@v7
-      - run: xcodebuild build -scheme routex-client-swift-Package -destination '${{ matrix.destination }}'
+      - run: xcodebuild build -scheme routex-client-swift-Package -destination '${{ matrix.platform.destination }}'
 
   linux:
     name: Build & test on Linux (swift ${{ matrix.swift }})
@@ -79,12 +84,16 @@ jobs:
           fi
 
   online-tests:
-    name: Online tests
+    name: Online tests (${{ matrix.os }})
     needs: [check, detect-online-secrets]
     if: needs.detect-online-secrets.outputs.available == 'true'
-    runs-on: macos-15
+    runs-on: ${{ matrix.os }}
     permissions:
       contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15, macos-26]
     env:
       YAXI_API_URL: ${{ secrets.YAXI_API_URL }}
       YAXI_API_KEY_ID: test
