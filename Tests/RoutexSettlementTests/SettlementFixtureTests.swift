@@ -2,23 +2,24 @@ import Crypto
 import Foundation
 @_spi(Interop) import RoutexCrypto
 import RoutexModels
+import RoutexTransport
 import Testing
 
 @testable import RoutexSettlement
 
 /// Runs `KeySettlement.verify` against a recorded settlement response: a
 /// real SEV-SNP Genoa attestation report with its AMD VCEK chain, and the
-/// system version signed by the CI test key. The js client pins the same
-/// fixture.
+/// system version signed by the CI test key. It is `routex-keys-fixtures`'
+/// V2 settlement, which needs ML-KEM-768.
 @Suite("Key settlement fixture")
 struct SettlementFixtureTests {
     // MARK: - Fixture
 
-    /// X25519 secret the fixture's chacha box is sealed to.
-    private static let clientSecret = Data([
-        227, 151, 53, 216, 6, 18, 173, 191, 95, 36, 131, 207, 133, 116, 233, 223,
-        94, 166, 160, 29, 222, 28, 20, 215, 39, 100, 3, 67, 142, 220, 254, 209,
-    ])
+    /// X25519 scalar and ML-KEM-768 seed the fixture's chacha box is sealed to.
+    private static let clientSecret = Data(
+        base64Encoded:
+            "zRHWSF1bWnLjDELVCOaIJi//LZHTRzFchgh5jyC9EqGqfmheuosz8P3YT6JgktfxWw3xdbdmuYFo8AG9jxhQ+6hFEcBSOr4rwYxtoJy91PBedsoREqDvzYnZ97TRLJpt"
+    )!
 
     private static let signingKeys: [String: Data] = [
         "dYa685dhHap8RSUtB4DDy1l4UcycsGhklBnV5a/4HSg=": Data([
@@ -28,22 +29,59 @@ struct SettlementFixtureTests {
     ]
 
     private static let chachaBox =
-        "c70P//zXw5WDN4ZVVBLbU6UVJdC4EswlNWUpM7Plvl+6yjgkv5+PTYzR5YKpArBhMiNEAD8PNhH65s7ZeZxmETOZF/EXUWC4"
-        + "Gr4hM0XOGUMvVWzeAbVHSVfRgNUb72z2PkP64zpkaRsz7CMZuSmwjOngXMmZBoJ3U9GOBCBUkF6Wr7PL5j6nrFcABO2x1rK7"
-        + "OZzxWHnm1PYZbNajoYInt0B//6PU5vk="
+        "AjQcpOy4o30ALLX9FLII+Hbflhqzu7q2UYMa6yzO2/atfQRxgl+0nqKFQ4zduo/iEEjqjW5QMv0h3ayDAcYSLj9xjyayqK1O"
+        + "TX4vZVfr5hjo6npE8FjRZ9CWS/o/IM8hxiDH7GvuXajc3TaGcnCHLkJXHWlXQP9s9oIEj8rmnOmWwhhzkF+MpR6kb+0FnuKo"
+        + "xJm67ZSnw9MhGPj6wMQCuxrSf+Sg8NUwb7X5H5Vjl19Na7ZNl7H60wcsdHwI+kBCZ7RgvsnyKj1l5tCmsxVqXMbAJCH9hJnW"
+        + "iKN3ucXnyrO1jld6dW7eT8gl4rDtLjgayfOIThdcKFz1ccwrgtlw6TtNU1YvX0krGXxiW7megisNllc6+WwHCntpgg//V63F"
+        + "Q7ZX+KbZUFreXaLzJ4HOloW3lOAZP/Z0ZSgJY69mMDbS1XN+7Deo0OFQ6bd+JZHXXuRFabva4U/SnpuYC+5qBa6ecD0eTEZK"
+        + "kZq1MqCo8cHQPiakcDjR/wpz7WPU3H+whfNb2++IPC4imk6Fj2KV88pjD6JlKS1g55bja2MWL/bEhk4de7TvwB+ySzkwfYES"
+        + "CreQBMncEjGuSMAUu6mX4q1TXsYeDJQ4KQg6Hn6LV7uIPCl+JufC5EzB8FjLB8FADMbiclezT8/M60FgSnt+Xuj1grtoN0xV"
+        + "AbVMuMB6XEaTfzetNpmiB0mF062h6tWozd9yp2ZCi+tA+KCXRhEjCIiISTDhrTy8+6gQunlApaBhDMNh1cVm4ZLYElOnFIGg"
+        + "2HfPBdNaALLG5Eun9PbKhPOem6WkkynBsstb0RVZMfkzTUQYrj02X/QKsAbZaGFoZ6QwubrM3gQYn3ZJk25sY3GlslpiP+QX"
+        + "vfQc40eunbcH80jC/xxOPvsRNnlw7QiD83k4dKh5Gd1tEW/ARELGQEcDrbrRJnxKVl3igi7C9w4MxDeU82q0Y5XrPQjw937E"
+        + "WFodz/HkwZhy7b5oxW8fTn2jg0kXECckNsldD95VPGpptlFV9tRCGXiokrndDJL36l5nBxm1AUp8RWVCclLa46oDsLeolnfu"
+        + "HEzQ3div4FRCdw4zrXj3ascP1Om7QBSzAnpHM0/59sGcTbAHgktMWtWEwvWB2q9xPSOqwFPewrhc3sTWJLYLKe5XV0ALu4fE"
+        + "2XmIjYllDGbdw2YKz7othpsNINiMh2dtKtJNozLESV7NWrQQXsxBmVBUhf7feUxIJg7sfAr8eZRgXaX9GSuMUXlVsZvZAu4o"
+        + "jUDW2YoHL4VFTJD4Iz+IoefyVjQJRXZxDWkXVxi7EjSgd4gGenmpQkKEXjOudmCqyqZFTS9QW5SUPvRlhNnEd1e6mMZzc6tB"
+        + "fwo7HwSUHqF8q3WrTtyopL7SRC5JYdSNi9qkTREodhPZSkd+uxVCQ9+87z4xWk988AsSzhZgIEzC355glbDGHgRsaMONjK7U"
+        + "2Phfg/t/+RnnWVdPXZUtJy6uLFZjQDi1JwIbhP3txLW6ORQcw0X7gAfZBDOoBeN6XX/NmRCLPCaD0HCLulXWX1z51py+s8Ge"
+        + "cuggk3SAIRMFs+Y3T/j253r93tm5Yj/BKxeopoGBv/tiZQZiGrzEcyNzoSCEy0mpZBaHQx/Y1n1BLWtKUx+sdD3w71cojggq"
+        + "iDkArBefBzIkvORQSxbefq31TZGBegbLMJxqp1ee+6xnM10DCZax7hMK47gLXDEAfQEFtW2ZpEdYNORK1nOTLI8Cac+X8i0A"
+        + "sPw6USTwo326gUkfbicFhLP2Q2jsrTEs431Rcn4nyYepEFgQMu+B4puFodyglVtSKHsBgQ5QTZ835uijmR60iDhWfXtLmP5+"
+        + "GRmbccUVeb1BSJs8p3xRYD/ZM7sTmzoBwbJBkpM/HA/6I3Cm6tmvkZBoXXGwlY5abLGRDUoEka5bEeLR+ijls2qw3s+i7X9K"
+        + "4ZWKnP4aekYEWOkC5Ah0rayZ4/h6oZsn1hCY1g01VyHxrWhABmU+khYZcXSvcDMi4geIbcZbC8Vt4gQv9otGkcSfthAAdhB6"
+        + "b3Kv0nzcnWo/F9bG5cJecWPfStjSCXFo8vSn59uVQ/9Pz78egiio1bBRV0IhWMp49JqDSGmPqvQDbKlS8pZHAO/UulXNYZBg"
+        + "LR5tvue3f4q0+G2lmn8QneQRF1eNaAi1A6Ez4IiV8I7cL7Ldu2f4zeXZhAsgmVp6bEd4wQa9LSQHJ/Kq5Pz+IWablH5H4yzn"
+        + "m6i2F8UjsVmufcOwvcnsRTLFq36i8gq5ss1VnAHzQ4+QRi7dmXfNcIcbUP4i0APfLVwLy402dz9YsNIsgT3sJpRZt0Z0TeMw"
+        + "eIk+aiTkjkWvZH53XcktG54ZpIi3aQ54CvFSeK76x5g2FHsoQU7J7pPu5Ww1yRfQTAK6FRlPOgrDpXBTZyNUJxqECzBcb8TU"
+        + "HoIYUl20j+Omvd4ZgTvNolbrIR4wVog3jBu9fEilfGqasvKgyreXqwk+Yjx6X23uCF5WYJ8jvGSTf0rCeS5lzk+e7bEOS2qW"
+        + "J5uzeCTlZAk1zxPGLUGR0hLrY1sgfXokfD6kLbzo8vY6ytJ7Yo655qtpfU1CrUF2EkQkDCyRtFdS7ESusIBHHupbVdofbGKM"
+        + "oGhZW+42WfsPZu45PLNJfdaGBNF4f4uZCi2kV84Mk6h6liKCspVKfHbjVHYJFEXLa1KhSPxQ4c6LAIho5tcUsrtzfwGFep5r"
+        + "c8xbxet5luCJGONXN/eZyRnXLzz+Le757aV+EmEl1lnqi0c7KlpHEG6gILoG1XMyRG/a0hwSXoatxmGpug8er/3mT8JpfKhW"
+        + "JAzTu/oiQy8yRRA5RmS+//eu2TYplRiBmUjE2u2lqvsDKbh+ohD34HnFs/XHT9N+wqvXZ/9STuRcxRuMl6eIrmzXhL4ut2Ik"
+        + "MKL62Q7JJOI4s0pUHCszZqAunXm3V8+Pj7NUxo53B4tjSzJe3IW+9VrvrzHlgsQcT+PeqwuxB+R9CvD+QJh7k0zc3kmMlSIZ"
+        + "AKigNcdJaXqJW4NNDVBWqyfZe7gjl8JyIZMG2OJEaix0wsQRRPtMPBZooJ35wKoN3z/+Eu86tFe0dVFuDFGnXMkiPFnlej5i"
+        + "bYb2a1dApYehqvO8xchB3w2XuEhmAjzf6VG3JeUwhbERTg6eHgYJwRry3yp70sgWK9tVFC8GFEFTv4g7odI4r/w4UaHD7mWT"
+        + "abxi70gcbIu5fseuwKgIl6uzVn8fl1jifYICzQvUxPNI9k0SpYDlq312tZ+Q1zue/1X9ia5jbE9yauRr4b/g2hpyH3JgmbDT"
+        + "WYbmGi1JEtT6Q4plQCL2iokpWesG9R4NrGUOQgIhxBT20sUS93gm/LoORfyiQu1NrFZ+tD9kL90+LPd2i18RL7Q3LgYQpaMK"
+        + "EhX/vjWpWEfzTMWhn8WyY0QmwWdb5r9+27ulv91hjsQO7VlANXnqAtgJktMke6u51+EIWdqqOGYBwC8PIJMKA9iHwtCpcpIK"
+        + "S0d025vdXpSJsyA6Qm6PqgFSAK44q9QZhaRijtGXr6Qg0Zd04jD4LdICoPqp1o1r6F55nUqu1OhBG3Kya6wwH8jvk9aqCzR6"
+        + "ueafvP8dts3rdTUTI4UiCWaZN/4urED9T19Vcs9Vz7Ew/I2eATZ4fx7I01OaYmVKn1wQRtNc/wJM6Zha1jLia3oIACHCvDte"
+        + "D0++cwRtU5FxXW03MPtTj7EFBTQn9mbfRDkGI7FaNUL7lM5O3R1ligcCmYnOAbAQ1w+2qTMjz2UJxyUvmvN0Pf+gB4M3lYz4"
+        + "15bi0EMc/pB9uiZd0NVf87n0HET4Dq9DDBrvXg=="
 
     private static let attestationReport =
-        "BQAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAKAAAAAAAbWCUAAAAAAAAA"
-        + "AAAAAAAAAAC7hR4gN0fDaF15opkQ52xTlXiW2/bmiDW2TqLCsr59tgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-        + "vs5zmaTaBUpjouP6Gkf/mMiOOR1DeRJvxOdcZ38lts1r/Y72CahjgEljOsfgDkrBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+        "BQAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAMAAAAAAAcWCUAAAAAAAAA"
+        + "AAAAAAAAAAAKZmjE/DP5/aA4bLtRtdV26vZSW95qet709MoZkH1L4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+        + "TMssXBMAGZpBwJLXgPEdf/Pi5JdPUY7QQLPBAoLDSc9ZUiBKrzul8hEIbNLQV7+JAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
         + "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-        + "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABi7rIj6+Czg/wjqW/1+ebErc8VNceg/WAmdAfxkwukIf//////////"
-        + "////////////////////////////////CgAAAAAAG1gZEQEAAAAAAAAAAAAAAAAAAAAAAAAAAADgI0vts5GEMfVO4nkHh9ev"
-        + "E4pnvh5YGiI2UOgQyUU0K8mujR/qg7McSdyMw020VwvPJb1teTmFaTqfDCEz3zPYCgAAAAAAG1gxNwEAMTcBAAoAAAAAABtY"
+        + "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADzx4p+EO16mBo42bbKmTZwLAzb8xTvcPClAPTyxHpxo///////////"
+        + "////////////////////////////////DAAAAAAAHFgZEQEAAAAAAAAAAAAAAAAAAAAAAAAAAADgI0vts5GEMfVO4nkHh9ev"
+        + "E4pnvh5YGiI2UOgQyUU0K8mujR/qg7McSdyMw020VwvPJb1teTmFaTqfDCEz3zPYDAAAAAAAHFgCOgEAAjoBAAwAAAAAABxY"
         + "CwAAAAAAAAALAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
         + "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-        + "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZYrjOIJQEkOAa96UY4bNzGBfb3rkU/nkYlrJPreawo+VxJapz1dauh50ZJaQlQAn"
-        + "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALN/WkfrqKgMOMMcOriyKfs6OwtTjsN6iSWKTnl7uQEpVKdNW8vEm/MBFYVbq8iKy"
+        + "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAihYgpg9LJ7iLHD5ZnX5BfBvee9BIbT3NSj3AZ8LN9BhMeCRbLVWKlq+/xWeGzPS8"
+        + "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAbt5S86xpMpn88WlEwHF2L2CyNdGF3hZQ7lgNvy9O1QWS+6RQMGH7ey6a5/cDtvB/"
         + "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
         + "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
         + "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
@@ -57,31 +95,31 @@ struct SettlementFixtureTests {
         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
-        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
+        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
-        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
+        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
-        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
+        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
-        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
-        FqMo
+        SAFlAwQCAgUAogMCATADggIBAD6ESgo6vQZi4CxpWWznTr31KlmTPREz+CfUNYOa
+        lj+Z+oV8dopoPSoza1H2DksnstVBaGY73+Jn/372lr1RmrLpetLam74K6DOuizv2
+        jJtMZ7yyOrjPlffjbkkHXftw+e8xjPjFGZ4uRazHD3iG2bBCW+kBpKgoR0U2bOYD
+        4aro2VYsg5HruJN/IK8lehKU9SRI7uM+wp91MYVNx+Bwjg3MHtYcM3EwXwwDLHPO
+        wGIZg6+LOHqcsUI2Ce47BLh0iVYE/bJQ9UE2s+HDmptjCeqlvhIBJ16S69UQNEeK
+        2jX3kxpi182ejMBzzrCic+hyIwNqnLUA4mLjvw9u2BFs/RWgCGo4QAB+YouCY2HW
+        M4uSS7N7nca9a6ppVnuPHMWjn9wL1tJ5ST/ouJI+rSOpOSVaQshW3/aopxRPh9Rp
+        cTauZ/LALF3LlJBEBgpcMaGuMEnCoo/9yImpDLMWXLCTvYYeGbTbNGlK3ZjEAK00
+        Ay6zMSsw00S9GmVRYFHQsPk0y+k0IZQ9MaxF5RK1CDo9nO7AtUzcdg1/3woFquXM
+        l4lHu8f/DBv8Z++s8RXdynWwu8aW+SGqtBbRllkxIHpYjlmIEpBoWu9tiC3BNqB/
+        eBqvNJAlg0D5AcSkV+9lPeTN5qBHqpoIaiz/QBA69wlXTGik1yc7kFZECGjY1irh
+        3iKB
         -----END CERTIFICATE-----
         -----BEGIN CERTIFICATE-----
         MIIGiTCCBDigAwIBAgIDAgACMEYGCSqGSIb3DQEBCjA5oA8wDQYJYIZIAWUDBAIC
@@ -167,27 +205,33 @@ struct SettlementFixtureTests {
             "systemVersion": [
                 "kind": "release",
                 "generation": 1,
-                "createdAt": "2025-11-14T17:32:12.826119714+00:00",
+                "createdAt": "2026-11-02T11:32:48.069055202+00:00",
                 "ref": "",
                 "launchMeasurement":
-                    "vs5zmaTaBUpjouP6Gkf/mMiOOR1DeRJvxOdcZ38lts1r/Y72CahjgEljOsfgDkrB",
+                    "TMssXBMAGZpBwJLXgPEdf/Pi5JdPUY7QQLPBAoLDSc9ZUiBKrzul8hEIbNLQV7+J",
                 "signature": [
                     "keyId": "dYa685dhHap8RSUtB4DDy1l4UcycsGhklBnV5a/4HSg=",
                     "value":
-                        "7J2D/9SOBeHAU1Z9Vr87Sf2jZuS6+5xofLUJX3y8SlDgQWZyArsxHfjKq6TACV9iQw8ZACndi72f8cqyC7i8DA==",
+                        "k/0reFqCkIWQjqgp9mdfvcnljxj2Cx+lYDAxxKH0Au8L7ugPlL1NQR4p8aFy4ojCfMYaIJC1EXn7T1YsTE9aAg==",
                 ] as [String: Any],
             ] as [String: Any],
         ]
     }
 
+    @available(iOS 26, macOS 26, macCatalyst 26, tvOS 26, watchOS 26, visionOS 26, *)
     private static func clientKeys() throws -> ChaChaBoxKeys {
-        let key = try Curve25519.KeyAgreement.PrivateKey(rawRepresentation: clientSecret)
+        let x25519 = clientSecret.prefix(32)
+        let mlkem = try MLKEM768SecretKey(seed: clientSecret.dropFirst(32))
         return ChaChaBoxKeys(
-            secret: .v1(clientSecret),
-            publicKey: .v1(key.publicKey.rawRepresentation)
+            secret: .v2(x25519: x25519, mlkem: mlkem),
+            publicKey: .v2(
+                x25519: try Curve25519.KeyAgreement.PrivateKey(rawRepresentation: x25519).publicKey.rawRepresentation,
+                mlkem: mlkem.encapsulationKey
+            )
         )
     }
 
+    @available(iOS 26, macOS 26, macCatalyst 26, tvOS 26, watchOS 26, visionOS 26, *)
     private static func verify(
         signingKeys: [String: Data] = SettlementFixtureTests.signingKeys,
         mutate: (inout [String: Any]) -> Void = { _ in }
@@ -203,6 +247,7 @@ struct SettlementFixtureTests {
         )
     }
 
+    @available(iOS 26, macOS 26, macCatalyst 26, tvOS 26, watchOS 26, visionOS 26, *)
     private func expectFailure(
         _ isExpected: (KeySettlementError) -> Bool,
         signingKeys: [String: Data] = SettlementFixtureTests.signingKeys,
@@ -219,6 +264,7 @@ struct SettlementFixtureTests {
     // MARK: - Tests
 
     @Test("the recorded settlement response verifies")
+    @available(iOS 26, macOS 26, macCatalyst 26, tvOS 26, watchOS 26, visionOS 26, *)
     func fixtureVerifies() throws {
         let result = try Self.verify()
         let sessionID = Data("fixedkeyfixedkeyfixedkeyfixedkey".utf8).base64EncodedString()
@@ -228,6 +274,7 @@ struct SettlementFixtureTests {
     }
 
     @Test("a tampered report fails attestation")
+    @available(iOS 26, macOS 26, macCatalyst 26, tvOS 26, watchOS 26, visionOS 26, *)
     func tamperedReport() throws {
         try expectFailure(
             { if case .attestationVerificationFailed = $0 { true } else { false } },
@@ -240,6 +287,7 @@ struct SettlementFixtureTests {
     }
 
     @Test("a tampered chacha box breaks the report binding")
+    @available(iOS 26, macOS 26, macCatalyst 26, tvOS 26, watchOS 26, visionOS 26, *)
     func tamperedChachaBox() throws {
         try expectFailure(
             { $0 == .chachaBoxBindingMismatch },
@@ -252,6 +300,7 @@ struct SettlementFixtureTests {
     }
 
     @Test("a broken VCEK chain fails attestation")
+    @available(iOS 26, macOS 26, macCatalyst 26, tvOS 26, watchOS 26, visionOS 26, *)
     func invalidVcek() throws {
         try expectFailure(
             { if case .attestationVerificationFailed = $0 { true } else { false } },
@@ -260,10 +309,81 @@ struct SettlementFixtureTests {
     }
 
     @Test("an unknown system-version key is rejected")
+    @available(iOS 26, macOS 26, macCatalyst 26, tvOS 26, watchOS 26, visionOS 26, *)
     func unknownSigningKey() throws {
         try expectFailure(
             { if case .systemVersionInvalid = $0 { true } else { false } },
             signingKeys: [:]
         )
+    }
+
+    // MARK: - Settlement request
+
+    private struct RequestBody: Decodable {
+        let publicKey: String
+        let version: Int
+    }
+
+    private actor RecordingTransport: HTTPTransport {
+        private let response: HTTPResponse
+        private(set) var requests: [HTTPRequest] = []
+
+        init() throws {
+            let body = try JSONSerialization.data(withJSONObject: SettlementFixtureTests.fixture())
+            response = HTTPResponse(status: 200, headers: [:], body: body)
+        }
+
+        func execute(_ request: HTTPRequest) -> HTTPResponse {
+            requests.append(request)
+            return response
+        }
+    }
+
+    /// A settlement against the recorded response, and the transport that
+    /// records its request.
+    private static func settlement(
+        clientKeys: ChaChaBoxKeys
+    ) throws -> (settlement: Settlement, transport: RecordingTransport) {
+        let transport = try RecordingTransport()
+        let settlement = Settlement(
+            baseURL: URL(string: "https://routex.invalid")!,
+            transport: transport,
+            signingKeys: signingKeys,
+            clientKeys: clientKeys
+        )
+        return (settlement, transport)
+    }
+
+    private static func requestBody(_ transport: RecordingTransport) async throws -> RequestBody {
+        let body = try #require(await transport.requests.first?.body)
+        return try JSONDecoder().decode(RequestBody.self, from: body)
+    }
+
+    @Test("a V1 client key settles with version 1 and refuses the V2 box")
+    func v1Request() async throws {
+        let key = Curve25519.KeyAgreement.PrivateKey()
+        let keys = ChaChaBoxKeys(secret: .v1(key.rawRepresentation), publicKey: .v1(key.publicKey.rawRepresentation))
+        let (settlement, transport) = try Self.settlement(clientKeys: keys)
+        let error = await #expect(throws: KeySettlementError.self) {
+            try await settlement.settle()
+        }
+        guard case .chachaBoxDecryptFailed = error else {
+            Issue.record("unexpected settlement error: \(String(describing: error))")
+            return
+        }
+        let body = try await Self.requestBody(transport)
+        #expect(body.publicKey == keys.publicKey.rawRepresentation.base64EncodedString())
+        #expect(body.version == 1)
+    }
+
+    @Test("a V2 client key settles with version 2")
+    @available(iOS 26, macOS 26, macCatalyst 26, tvOS 26, watchOS 26, visionOS 26, *)
+    func v2Request() async throws {
+        let keys = try Self.clientKeys()
+        let (settlement, transport) = try Self.settlement(clientKeys: keys)
+        try await settlement.settle()
+        let body = try await Self.requestBody(transport)
+        #expect(body.publicKey == keys.publicKey.rawRepresentation.base64EncodedString())
+        #expect(body.version == 2)
     }
 }

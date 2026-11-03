@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.6.1] - 2026-11-03
+
+### Changed
+
+- `traceID` is reset with every request, so it is empty if a request fails without a response
+
+### Security
+
+- Key settlement uses hybrid X25519 + ML-KEM-768 (FIPS 203) post-quantum key exchange; Apple platforms below OS version 26 use X25519 only.
+
 ## [0.6.0] - 2026-10-28
 
 ### Added

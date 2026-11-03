@@ -144,8 +144,16 @@ enum KeySettlement {
                 reason: "publicKey is not valid base64"
             )
         }
+        let serverPublicKey: ChaChaBoxPublicKey
+        do {
+            serverPublicKey = try ChaChaBoxPublicKey(rawRepresentation: serverKeyBytes)
+        } catch {
+            throw KeySettlementError.invalidSealedPayload(
+                reason: "publicKey is not a valid key: \(error)"
+            )
+        }
         return SealedPayload(
-            serverPublicKey: .v1(serverKeyBytes),
+            serverPublicKey: serverPublicKey,
             sessionID: parsed.sessionID
         )
     }

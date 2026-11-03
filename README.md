@@ -16,7 +16,7 @@ Requires Swift 6.1 or newer.
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/yaxitech/routex-client-swift", from: "0.6.0")
+    .package(url: "https://github.com/yaxitech/routex-client-swift", from: "0.6.1")
 ],
 targets: [
     .target(

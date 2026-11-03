@@ -75,6 +75,7 @@ package actor RoutexClientCore {
         path: String,
         body: Data?
     ) async throws -> Data {
+        lastTraceID = nil
         let s = settlement(for: ticket.id)
         let ticketIdHex = ticket.id.uuidString.lowercased()
         try await s.ensureSettled(extraHeaders: [

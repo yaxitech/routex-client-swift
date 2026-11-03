@@ -55,6 +55,18 @@ enum DemoData {
     static let demoTransactionRange: TransactionsRange =
         .period(from: try! ISODate("2019-01-13"), to: nil)
 
+    /// Dynamic recent window. Non-interactive transactions trigger SCA for
+    /// windows of 90 days or more, so stay just under that.
+    static let demoTransactionRecentRange: TransactionsRange = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        return .period(
+            from: try! ISODate(formatter.string(from: Date(timeIntervalSinceNow: -89 * 86_400))),
+            to: nil
+        )
+    }()
+
     /// Bogus URL redirect callback used by `RoutexClient.setRedirectURI(_:)`
     /// and `registerRedirectURI(...)`.
     static let callbackURI = "smoketest://redirect"

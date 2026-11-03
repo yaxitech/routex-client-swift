@@ -80,12 +80,9 @@ public actor Settlement {
             ]
             for (name, value) in extraHeaders { headers[name] = value }
 
-            let publicKeyBase64: String = {
-                switch clientKeys.publicKey {
-                case .v1(let bytes): return bytes.base64EncodedString()
-                }
-            }()
-            let body = Data(#"{"publicKey":"\#(publicKeyBase64)"}"#.utf8)
+            let publicKey = clientKeys.publicKey
+            let publicKeyBase64 = publicKey.rawRepresentation.base64EncodedString()
+            let body = Data(#"{"publicKey":"\#(publicKeyBase64)","version":\#(publicKey.version)}"#.utf8)
 
             let response = try await transport.execute(
                 HTTPRequest(method: .post, url: url, headers: headers, body: body)

@@ -5,9 +5,9 @@
 //   T(i) = HMAC-BLAKE2b-512(PRK, T(i-1) || info || i)
 //   OKM  = T(1) || T(2) || ... truncated to L bytes
 //
-// The routex settlement protocol uses HKDF with an empty salt and a 32-byte OKM,
-// so a single expand round is always sufficient there. The implementation
-// supports up to 255 * hashLen bytes of output as required by RFC 5869.
+// The routex settlement protocol uses HKDF with a 32-byte OKM, so a single
+// expand round is always sufficient there. The implementation supports up
+// to 255 * hashLen bytes of output as required by RFC 5869.
 
 import Foundation
 

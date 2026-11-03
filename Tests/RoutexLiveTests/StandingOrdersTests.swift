@@ -30,7 +30,7 @@ struct StandingOrdersTests {
         #expect(abs(decoded.timestamp.timeIntervalSinceNow) < 60)
 
         let orders = decoded.data
-        try #require(orders.count == 2, "unexpected standing orders: \(orders)")
+        try #require(orders.count == 4, "unexpected standing orders: \(orders)")
         let rent = orders[0]
         let broadcasting = orders[1]
 

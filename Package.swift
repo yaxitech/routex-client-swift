@@ -89,7 +89,10 @@ let package = Package(
         ),
         .testTarget(
             name: "RoutexCryptoTests",
-            dependencies: ["RoutexCrypto"],
+            dependencies: [
+                "RoutexCrypto",
+                .product(name: "Crypto", package: "swift-crypto"),
+            ],
             resources: [.copy("Resources/blake2b-kat.txt")]
         ),
         .testTarget(
@@ -98,6 +101,7 @@ let package = Package(
                 "RoutexCrypto",
                 "RoutexModels",
                 "RoutexSettlement",
+                "RoutexTransport",
                 .product(name: "Crypto", package: "swift-crypto"),
             ]
         ),

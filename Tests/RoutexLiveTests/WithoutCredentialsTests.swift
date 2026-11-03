@@ -13,18 +13,6 @@ struct WithoutCredentialsTests {
         currency: "EUR"
     )
 
-    /// Windows of 90 days or more cost the demo bank its SCA exemption, so
-    /// stay just under that.
-    private static let recentRange: TransactionsRange = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = TimeZone(identifier: "UTC")
-        return .period(
-            from: try! ISODate(formatter.string(from: Date(timeIntervalSinceNow: -89 * 86_400))),
-            to: nil
-        )
-    }()
-
     /// The demo `refresh` user answers the first call with a result, so its
     /// `connectionData` is reusable right away.
     private func establishedConnectionData(_ env: LiveEnvironment) async throws -> ConnectionData {
@@ -70,7 +58,7 @@ struct WithoutCredentialsTests {
         let transactions = try await client.transactions(
             ticket: try env.issuer.transactions(
                 account: Self.demoAccount,
-                range: Self.recentRange
+                range: DemoData.demoTransactionRecentRange
             ),
             connectionData: connectionData
         )

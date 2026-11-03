@@ -15,18 +15,6 @@ struct RefreshTests {
         currency: "EUR"
     )
 
-    /// Non-interactive transactions trigger SCA for windows of 90 days or
-    /// more, so stay just under that.
-    private static let recentRange: TransactionsRange = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = TimeZone(identifier: "UTC")
-        return .period(
-            from: try! ISODate(formatter.string(from: Date(timeIntervalSinceNow: -89 * 86_400))),
-            to: nil
-        )
-    }()
-
     /// Drive an interactive balances flow (`userID: "result"` skips dialogs)
     /// with recurring consent and return its `connectionData`.
     private func capturedConnectionData(_ env: LiveEnvironment) async throws -> ConnectionData {
@@ -67,7 +55,7 @@ struct RefreshTests {
         #expect(balance.dateTime != nil)
 
         let transactions = try await client.transactions(
-            ticket: env.issuer.transactions(account: Self.demoAccount, range: Self.recentRange),
+            ticket: env.issuer.transactions(account: Self.demoAccount, range: DemoData.demoTransactionRecentRange),
             connectionData: connectionData
         )
         #expect(transactions.result != nil)

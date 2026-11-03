@@ -22,10 +22,9 @@ struct LiveEnvironment: Sendable {
     /// `nil` means use the built-in production verifier keys.
     let testSigningKeys: [String: Data]?
     /// Fixed client keypair for runs against an unattested routex (set when
-    /// `ROUTEX_UNATTESTED=true` is exported). The unattested service accepts
-    /// only this public key and replays a canned settlement response sealed
-    /// to it, so the regular verification chain still passes. `nil` for
-    /// attested runs.
+    /// `ROUTEX_UNATTESTED=true` is exported). The unattested service replays
+    /// a canned settlement response sealed to it, so the regular verification
+    /// chain still passes. `nil` for attested runs.
     let unattestedClientKeys: ChaChaBoxKeys?
 
     /// Whether all required env vars are present.
@@ -140,22 +139,27 @@ struct LiveEnvironment: Sendable {
             Data(base64Encoded: "qzLgDnRegbiQzY416i9/MClrmMp24jcHzaWCWSWSutA=")!
     ]
 
-    /// X25519 keypair the unattested routex's canned settlement response is
+    /// Keypair the unattested routex's canned V2 settlement response is
     /// sealed to, mirroring `routex-keys-fixtures`. Public by design; an
     /// unattested run provides no confidentiality. It is a development fixture
     /// for a locally built unattested routex and grants no access anywhere, so
     /// it must never be used against `api.yaxi.tech`.
     private static let fixedUnattestedClientKeys: ChaChaBoxKeys = {
-        let scalar = Data([
-            0xe3, 0x97, 0x35, 0xd8, 0x06, 0x12, 0xad, 0xbf,
-            0x5f, 0x24, 0x83, 0xcf, 0x85, 0x74, 0xe9, 0xdf,
-            0x5e, 0xa6, 0xa0, 0x1d, 0xde, 0x1c, 0x14, 0xd7,
-            0x27, 0x64, 0x03, 0x43, 0x8e, 0xdc, 0xfe, 0xd1,
-        ])
-        let key = try! Curve25519.KeyAgreement.PrivateKey(rawRepresentation: scalar)
+        guard #available(iOS 26, macOS 26, macCatalyst 26, tvOS 26, watchOS 26, visionOS 26, *) else {
+            preconditionFailure("ROUTEX_UNATTESTED needs ML-KEM-768")
+        }
+        let secret = Data(
+            base64Encoded:
+                "zRHWSF1bWnLjDELVCOaIJi//LZHTRzFchgh5jyC9EqGqfmheuosz8P3YT6JgktfxWw3xdbdmuYFo8AG9jxhQ+6hFEcBSOr4rwYxtoJy91PBedsoREqDvzYnZ97TRLJpt"
+        )!
+        let x25519 = secret.prefix(32)
+        let mlkem = try! MLKEM768SecretKey(seed: secret.dropFirst(32))
         return ChaChaBoxKeys(
-            secret: .v1(scalar),
-            publicKey: .v1(key.publicKey.rawRepresentation)
+            secret: .v2(x25519: x25519, mlkem: mlkem),
+            publicKey: .v2(
+                x25519: try! Curve25519.KeyAgreement.PrivateKey(rawRepresentation: x25519).publicKey.rawRepresentation,
+                mlkem: mlkem.encapsulationKey
+            )
         )
     }()
 }

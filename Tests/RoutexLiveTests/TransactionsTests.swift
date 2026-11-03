@@ -10,7 +10,7 @@ struct TransactionsTests {
         let client = env.makeClient()
         let ticket = try env.issuer.transactions(
             account: AccountReference(id: .iban(DemoData.demoAccountIBAN), currency: "EUR"),
-            range: DemoData.demoTransactionRange
+            range: DemoData.demoTransactionRecentRange
         )
 
         let response = try await client.transactions(
