@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.6.2] - 2026-11-03
+
+### Fixed
+
+- Builds with Xcode 16 (Swift 6.1) on Apple platforms; key settlement then uses X25519 only
+
 ## [0.6.1] - 2026-11-03
 
 ### Changed

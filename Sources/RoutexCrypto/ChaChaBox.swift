@@ -15,6 +15,7 @@ private let versionV2: UInt8 = 0x02
 private let x25519KeySize = 32
 private let mlkemEncapsulationKeySize = 1184
 private let mlkemCiphertextSize = 1088
+private let mlkemSeedSize = 64
 private let tagSize = 16
 private let v2KDFSalt = Data("chacha_box_ietf/v2".utf8)
 
@@ -72,22 +73,12 @@ private let v2KDFSalt = Data("chacha_box_ietf/v2".utf8)
 
     /// Expand the 64-byte FIPS 203 key generation seed `d || z`.
     public init(seed: Data) throws {
-        guard #available(iOS 26, macOS 26, macCatalyst 26, tvOS 26, watchOS 26, visionOS 26, *) else {
-            throw ChaChaBoxError.unsupportedVersion(versionV2)
-        }
-        let key: MLKEM768.PrivateKey
-        do {
-            key = try MLKEM768.PrivateKey(seedRepresentation: seed, publicKey: nil)
-        } catch {
-            throw ChaChaBoxError.malformedKey
-        }
-        self.init(key)
+        self = try MLKEM768Operations.expand(seed: seed)
     }
 
-    @available(iOS 26, macOS 26, macCatalyst 26, tvOS 26, watchOS 26, visionOS 26, *)
-    fileprivate init(_ key: MLKEM768.PrivateKey) {
-        encapsulationKey = key.publicKey.rawRepresentation
-        decapsulator = { try key.decapsulate($0).withUnsafeBytes { Data($0) } }
+    fileprivate init(encapsulationKey: Data, decapsulator: @escaping @Sendable (Data) throws -> Data) {
+        self.encapsulationKey = encapsulationKey
+        self.decapsulator = decapsulator
     }
 
     fileprivate func decapsulate(_ ciphertext: Data) throws -> Data {
@@ -301,6 +292,18 @@ private let v2KDFSalt = Data("chacha_box_ietf/v2".utf8)
     }
 }
 
+extension MLKEM768Operations {
+    // CryptoKit defers the FIPS 203 encapsulation key check (section 7.2) to
+    // encapsulation.
+    static func validate(encapsulationKey: Data) throws {
+        _ = try encapsulate(to: encapsulationKey)
+    }
+}
+
+// On Apple platforms, swift-crypto re-exports CryptoKit, which ships
+// ML-KEM-768 only with the OS 26 SDKs (Swift 6.2). Elsewhere, swift-crypto
+// implements it with BoringSSL.
+#if !canImport(CryptoKit) || compiler(>=6.2)
 private enum MLKEM768Operations {
     static func generate() -> MLKEM768SecretKey? {
         guard #available(iOS 26, macOS 26, macCatalyst 26, tvOS 26, watchOS 26, visionOS 26, *),
@@ -308,13 +311,24 @@ private enum MLKEM768Operations {
         else {
             return nil
         }
-        return MLKEM768SecretKey(key)
+        return secretKey(key)
     }
 
-    // CryptoKit defers the FIPS 203 encapsulation key check (section 7.2) to
-    // encapsulation.
-    static func validate(encapsulationKey: Data) throws {
-        _ = try encapsulate(to: encapsulationKey)
+    static func expand(seed: Data) throws -> MLKEM768SecretKey {
+        guard #available(iOS 26, macOS 26, macCatalyst 26, tvOS 26, watchOS 26, visionOS 26, *) else {
+            throw ChaChaBoxError.unsupportedVersion(versionV2)
+        }
+        // CryptoKit traps instead of throwing on a seed of the wrong length.
+        guard seed.count == mlkemSeedSize else {
+            throw ChaChaBoxError.malformedKey
+        }
+        let key: MLKEM768.PrivateKey
+        do {
+            key = try MLKEM768.PrivateKey(seedRepresentation: seed, publicKey: nil)
+        } catch {
+            throw ChaChaBoxError.malformedKey
+        }
+        return secretKey(key)
     }
 
     static func encapsulate(to encapsulationKey: Data) throws -> (ciphertext: Data, sharedSecret: Data) {
@@ -329,4 +343,26 @@ private enum MLKEM768Operations {
         }
         return (result.encapsulated, result.sharedSecret.withUnsafeBytes { Data($0) })
     }
+
+    @available(iOS 26, macOS 26, macCatalyst 26, tvOS 26, watchOS 26, visionOS 26, *)
+    private static func secretKey(_ key: MLKEM768.PrivateKey) -> MLKEM768SecretKey {
+        MLKEM768SecretKey(encapsulationKey: key.publicKey.rawRepresentation) {
+            try key.decapsulate($0).withUnsafeBytes { Data($0) }
+        }
+    }
 }
+#else
+private enum MLKEM768Operations {
+    static func generate() -> MLKEM768SecretKey? {
+        nil
+    }
+
+    static func expand(seed: Data) throws -> MLKEM768SecretKey {
+        throw ChaChaBoxError.unsupportedVersion(versionV2)
+    }
+
+    static func encapsulate(to encapsulationKey: Data) throws -> (ciphertext: Data, sharedSecret: Data) {
+        throw ChaChaBoxError.unsupportedVersion(versionV2)
+    }
+}
+#endif
