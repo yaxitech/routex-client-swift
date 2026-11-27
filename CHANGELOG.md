@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.7.0] - 2026-11-27
+
+### Changed
+
+- **Breaking:** `balances` takes a single `account` instead of `accounts`
+- **Breaking:** `StandingOrder.startDate` is optional
+
+### Removed
+
+- `Balances.missingAccounts`
+
+### Fixed
+
+- Accept VCEKs with nonzero serial numbers, which AMD now issues contrary to its own specification
+
 ## [0.6.2] - 2026-11-03
 
 ### Fixed

@@ -15,7 +15,7 @@ struct BalancesRequestBody: Encodable, Sendable {
     var credentials: Credentials
     var session: Session?
     var recurringConsents: Bool?
-    var accounts: [AccountReference]
+    var account: AccountReference
 }
 
 struct TransactionsRequestBody: Encodable, Sendable {
@@ -44,7 +44,7 @@ struct AccountsConnectionDataBody: Encodable, Sendable {
 struct BalancesConnectionDataBody: Encodable, Sendable {
     var connectionData: ConnectionData
     var session: Session?
-    var accounts: [AccountReference]
+    var account: AccountReference
 }
 
 struct TransactionsConnectionDataBody: Encodable, Sendable {

@@ -6,7 +6,7 @@ import RoutexTransport
 
 /// Swift client for the YAXI Open Banking non-interactive (refresh)
 /// services: ``accounts(ticket:connectionData:fields:filter:session:)``,
-/// ``balances(ticket:connectionData:accounts:session:)``, and
+/// ``balances(ticket:connectionData:account:session:)``, and
 /// ``transactions(ticket:connectionData:session:)``, plus the discovery
 /// endpoints ``info(ticket:connectionID:)`` and
 /// ``search(ticket:filters:ibanDetection:limit:details:)``.
@@ -168,26 +168,26 @@ public final class RoutexRefreshClient: Sendable {
         return try await send(ticket: ticket, path: "accounts/non-interactive", body: body)
     }
 
-    /// Refresh current balances for `accounts` under `connectionData`.
+    /// Refresh current balances for `account` under `connectionData`.
     ///
     /// - Parameters:
     ///   - ticket: Backend-issued `BalancesTicket` authorizing the call.
     ///   - connectionData: Envelope from a successful interactive flow.
-    ///   - accounts: Accounts to fetch balances for.
+    ///   - account: Account to fetch balances for.
     ///   - session: Optional `Session` returned by a previous call in the
     ///     same flow.
     /// - SeeAlso: [Balances service reference](https://docs.yaxi.tech/balances.html)
     public func balances(
         ticket: BalancesTicket,
         connectionData: ConnectionData,
-        accounts: [AccountReference],
+        account: AccountReference,
         session: Session? = nil
     ) async throws -> NonInteractiveResponse<Balances> {
         let body = NonInteractiveBalancesBody(
             connectionData: connectionData,
             session: session,
             userInSession: userInSession,
-            accounts: accounts
+            account: account
         )
         return try await send(ticket: ticket, path: "balances/non-interactive", body: body)
     }

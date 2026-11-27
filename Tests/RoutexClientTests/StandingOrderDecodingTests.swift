@@ -35,8 +35,9 @@ struct StandingOrderDecodingTests {
 
     @Test("decodes a sparse standing order")
     func sparseOrder() throws {
-        let json = Data(#"{"startDate":"2023-02-01","amount":{"currency":"EUR","amount":"55.08"}}"#.utf8)
+        let json = Data(#"{"amount":{"currency":"EUR","amount":"55.08"}}"#.utf8)
         let order = try JSONDecoder().decode(StandingOrder.self, from: json)
+        #expect(order.startDate == nil)
         #expect(order.frequency == nil)
         #expect(order.executionRule == nil)
         #expect(order.remittanceInformation.isEmpty)

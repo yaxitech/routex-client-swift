@@ -3,7 +3,7 @@ import Foundation
 /// A standing order set up on an account.
 public struct StandingOrder: Sendable, Hashable, Codable {
     /// Date of the first execution as ISO `YYYY-MM-DD`.
-    public let startDate: ISODate
+    public let startDate: ISODate?
     /// Date of the last execution as ISO `YYYY-MM-DD`.
     public let endDate: ISODate?
     /// Rule to follow if the execution falls on a weekend or bank holiday.
@@ -32,7 +32,7 @@ public struct StandingOrder: Sendable, Hashable, Codable {
 
     /// Build a `StandingOrder`.
     public init(
-        startDate: ISODate,
+        startDate: ISODate? = nil,
         endDate: ISODate? = nil,
         executionRule: ExecutionRule? = nil,
         frequency: Frequency? = nil,
@@ -69,7 +69,7 @@ public struct StandingOrder: Sendable, Hashable, Codable {
 
     public init(from decoder: any Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        self.startDate = try c.decode(ISODate.self, forKey: .startDate)
+        self.startDate = try c.decodeIfPresent(ISODate.self, forKey: .startDate)
         self.endDate = try c.decodeIfPresent(ISODate.self, forKey: .endDate)
         self.executionRule = try c.decodeIfPresent(ExecutionRule.self, forKey: .executionRule)
         self.frequency = try c.decodeIfPresent(Frequency.self, forKey: .frequency)
@@ -88,7 +88,7 @@ public struct StandingOrder: Sendable, Hashable, Codable {
 
     public func encode(to encoder: any Encoder) throws {
         var c = encoder.container(keyedBy: CodingKeys.self)
-        try c.encode(startDate, forKey: .startDate)
+        try c.encodeIfPresent(startDate, forKey: .startDate)
         try c.encodeIfPresent(endDate, forKey: .endDate)
         try c.encodeIfPresent(executionRule, forKey: .executionRule)
         try c.encodeIfPresent(frequency, forKey: .frequency)

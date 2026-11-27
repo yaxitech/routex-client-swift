@@ -63,10 +63,7 @@ enum VcekChainOps {
             throw VcekChainError.chainBroken(reason: "leaf subject common name is not SEV-VCEK")
         }
 
-        // AMD doc 57230 Table 9: the VCEK serial number is zero.
-        guard leaf.serialNumber.allSatisfy({ $0 == 0 }) else {
-            throw VcekChainError.chainBroken(reason: "leaf serial number is not zero")
-        }
+        // Contrary to AMD doc 57230 Table 9, KDS issues VCEKs with nonzero serial numbers.
 
         // AMD doc 57230 Table 9: the VCEK public key is ECDSA on curve P-384.
         guard (try? leaf.p384PublicKey()) != nil else {

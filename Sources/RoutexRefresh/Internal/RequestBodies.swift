@@ -17,7 +17,7 @@ struct NonInteractiveBalancesBody: Encodable, Sendable {
     var connectionData: ConnectionData
     var session: Session?
     var userInSession: UserInSession?
-    var accounts: [AccountReference]
+    var account: AccountReference
 }
 
 struct NonInteractiveTransactionsBody: Encodable, Sendable {

@@ -78,7 +78,7 @@ import RoutexTransport
 /// ### Services
 ///
 /// - ``accounts(ticket:credentials:fields:filter:session:recurringConsents:)``
-/// - ``balances(ticket:credentials:accounts:session:recurringConsents:)``
+/// - ``balances(ticket:credentials:account:session:recurringConsents:)``
 /// - ``transactions(ticket:credentials:session:recurringConsents:)``
 /// - ``standingOrders(ticket:credentials:session:recurringConsents:)``
 /// - ``collectPayment(ticket:credentials:account:session:recurringConsents:)``
@@ -87,7 +87,7 @@ import RoutexTransport
 /// ### Services without credentials
 ///
 /// - ``accounts(ticket:connectionData:fields:filter:session:)``
-/// - ``balances(ticket:connectionData:accounts:session:)``
+/// - ``balances(ticket:connectionData:account:session:)``
 /// - ``transactions(ticket:connectionData:session:)``
 ///
 /// ### Continuing an interrupt
@@ -352,12 +352,12 @@ public final class RoutexClient: Sendable {
     }
 
     /// Invoke the [balances service](https://docs.yaxi.tech/balances.html):
-    /// fetch current balances for `accounts`.
+    /// fetch current balances for `account`.
     ///
     /// - Parameters:
     ///   - ticket: Backend-issued `BalancesTicket` authorizing the call.
     ///   - credentials: User credentials envelope (see `Credentials`).
-    ///   - accounts: Accounts to fetch balances for.
+    ///   - account: Account to fetch balances for.
     ///   - session: Optional `Session` returned by a previous call in the
     ///     same flow.
     ///   - recurringConsents: When `true`, request a long-lived consent
@@ -366,7 +366,7 @@ public final class RoutexClient: Sendable {
     public func balances(
         ticket: BalancesTicket,
         credentials: Credentials,
-        accounts: [AccountReference],
+        account: AccountReference,
         session: Session? = nil,
         recurringConsents: Bool = false
     ) async throws -> Response<BalancesResult> {
@@ -374,7 +374,7 @@ public final class RoutexClient: Sendable {
             credentials: credentials,
             session: session,
             recurringConsents: recurringConsents ? true : nil,
-            accounts: accounts
+            account: account
         )
         return try await execute(ticket: ticket, path: "balances/service", body: body)
     }
@@ -386,19 +386,19 @@ public final class RoutexClient: Sendable {
     ///   - ticket: Backend-issued `BalancesTicket` authorizing the call.
     ///   - connectionData: Envelope from an earlier flow's
     ///     `result.connectionData`.
-    ///   - accounts: Accounts to fetch balances for.
+    ///   - account: Account to fetch balances for.
     ///   - session: Optional `Session` returned by a previous call in the
     ///     same flow.
     public func balances(
         ticket: BalancesTicket,
         connectionData: ConnectionData,
-        accounts: [AccountReference],
+        account: AccountReference,
         session: Session? = nil
     ) async throws -> Response<BalancesResult> {
         let body = BalancesConnectionDataBody(
             connectionData: connectionData,
             session: session,
-            accounts: accounts
+            account: account
         )
         return try await execute(ticket: ticket, path: "balances/service", body: body)
     }

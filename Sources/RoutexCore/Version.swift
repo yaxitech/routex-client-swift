@@ -3,7 +3,7 @@
 
 enum Version {
     static let major = 0
-    static let minor = 6
-    static let patch = 2
+    static let minor = 7
+    static let patch = 0
     static let versionString = "\(major).\(minor).\(patch)"
 }

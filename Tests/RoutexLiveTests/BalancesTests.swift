@@ -16,7 +16,7 @@ struct BalancesTests {
                 connectionID: DemoData.demoConnection,
                 userID: "confirmation"
             ),
-            accounts: [AccountReference(id: .iban(DemoData.demoAccountIBAN), currency: "EUR")]
+            account: AccountReference(id: .iban(DemoData.demoAccountIBAN), currency: "EUR")
         )
         guard case .dialog(let dialog) = initial,
             case .confirmation(let context, _) = dialog.input
@@ -32,5 +32,22 @@ struct BalancesTests {
         let decoded = try result.authenticated.decodeUnverified()
 
         #expect(!decoded.data.balances.isEmpty)
+    }
+
+    @Test func unknownAccountIsNotFound() async throws {
+        let env = try #require(LiveEnvironment.load())
+        let client = env.makeClient()
+        let ticket = try env.issuer.balances()
+
+        await #expect(throws: RoutexError.notFound) {
+            _ = try await client.balances(
+                ticket: ticket,
+                credentials: Credentials(
+                    connectionID: DemoData.demoConnection,
+                    userID: "result"
+                ),
+                account: AccountReference(id: .iban("NL31YAXI1234567891"), currency: "EUR")
+            )
+        }
     }
 }

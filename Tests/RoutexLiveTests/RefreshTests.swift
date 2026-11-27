@@ -21,7 +21,7 @@ struct RefreshTests {
         let response = try await env.makeClient().balances(
             ticket: env.issuer.balances(),
             credentials: Credentials(connectionID: DemoData.demoConnection, userID: "result"),
-            accounts: [Self.demoAccount],
+            account: Self.demoAccount,
             recurringConsents: true
         )
         guard case .result(let result) = response else {
@@ -48,7 +48,7 @@ struct RefreshTests {
         let balances = try await client.balances(
             ticket: env.issuer.balances(),
             connectionData: connectionData,
-            accounts: [Self.demoAccount]
+            account: Self.demoAccount
         )
         #expect(!balances.result.balances.isEmpty)
         let balance = try #require(balances.result.balances.first?.balances.first)

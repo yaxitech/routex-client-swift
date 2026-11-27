@@ -48,7 +48,7 @@ struct WithoutCredentialsTests {
         let balances = try await client.balances(
             ticket: try env.issuer.balances(),
             connectionData: connectionData,
-            accounts: [Self.demoAccount]
+            account: Self.demoAccount
         )
         guard case .result(let balancesResult) = balances else {
             throw WithoutCredentialsTestError.unexpected("expected .result, got \(balances)")

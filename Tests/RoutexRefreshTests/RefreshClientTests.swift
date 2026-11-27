@@ -53,7 +53,7 @@ struct RefreshClientTests {
             #"""
             {"result":{"balances":[{"account":{"iban":"DE89370400440532013000","currency":"EUR"},
             "balances":[{"amount":"3.14","currency":"EUR","balanceType":"Booked",
-            "dateTime":"1970-01-01T00:00:01.500Z"}]}],"missingAccounts":[]},"session":"AQID"}
+            "dateTime":"1970-01-01T00:00:01.500Z"}]}]},"session":"AQID"}
             """#.utf8
         )
         let (client, transport) = makeClient([HTTPResponse(status: 200, headers: [:], body: body)])
@@ -61,16 +61,18 @@ struct RefreshClientTests {
         let response = try await client.balances(
             ticket: ticket,
             connectionData: ConnectionData(Data([7])),
-            accounts: [AccountReference(id: .iban("DE89370400440532013000"), currency: "EUR")]
+            account: AccountReference(id: .iban("DE89370400440532013000"), currency: "EUR")
         )
 
-        #expect(response.result.missingAccounts.isEmpty)
         #expect(response.session == Session(Data([1, 2, 3])))
         let balance = try #require(response.result.balances.first?.balances.first)
         #expect(balance.dateTime == Date(timeIntervalSince1970: 1.5))
 
         let request = try #require(await transport.recorded().first)
         #expect(request.url.path.hasSuffix("balances/non-interactive"))
+        let sent = String(decoding: try #require(request.body), as: UTF8.self)
+        #expect(sent.contains(#""account":{"#))
+        #expect(!sent.contains(#""accounts""#))
     }
 
     @Test("transactions() decodes a null result as nil")
